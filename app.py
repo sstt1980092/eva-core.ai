@@ -73,6 +73,23 @@ st.markdown(
         box-shadow: 0 0 10px #2ea043;
     }
 
+    /* Стилевой блок для гарантированного отображения крипто-поддержки */
+    .crypto-card {
+        background-color: #161b22;
+        border: 1px solid #f39c12;
+        border-radius: 10px;
+        padding: 14px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .crypto-title {
+        color: #f39c12;
+        font-weight: bold;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
     [data-testid="stChatMessage"] {
         background-color: #161b22;
         border: 1px solid #21262d;
@@ -192,28 +209,23 @@ if st.sidebar.button("🔄 Clear System Context", use_container_width=True):
   st.session_state.messages = []
   st.rerun()
 
-# === БЛОК «ПОДДЕРЖАТЬ ПРОЕКТ» (DONATE) ===
-st.sidebar.divider()
-st.sidebar.markdown("### 💎 Support the Project / Поддержка")
+# === ЯВНЫЙ ВИДИМЫЙ БЛОК ПОДДЕРЖКИ ПРОЕКТА (КРИПТОВАЛЮТЫ) ===
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 💎 Support the Project")
+st.sidebar.caption("Поддержать развитие исследовательской станции EVA Core:")
 
-with st.sidebar.expander("☕ Поддержать EVA Core AI", expanded=False):
-  st.markdown(
-      """
-        Если проект вам полезен, вы можете поддержать развитие исследовательской станции:
-        
-        * **Bitcoin (BTC):**  
-        `bc1q5hdx0z4v876p303amkqq3r9qx2wem7p4wlhq3f`
-        
-        * **Ethereum (ETH):**  
-        `0xa63dC4a463E1F82314bFbC29DE87234c49d42dbF`
-        
-        * **Litecoin (LTC):**  
-        `ltc1qfc7pvc072rq0arc7ewz84jh0z7lwwtk7nhe84q`
-        
-        * **PayPal USD (PYUSD / EVM):**  
-        `0x2E49F25Ef7BA15E939402589B0F6C1338FB14285`
-        """
-  )
+# Использование st.code обеспечивает красивую подсвеченную плашку и встроенную кнопку копирования
+st.sidebar.markdown("**Bitcoin (BTC)**")
+st.sidebar.code("bc1q5hdx0z4v876p303amkqq3r9qx2wem7p4wlhq3f", language="text")
+
+st.sidebar.markdown("**Ethereum (ETH)**")
+st.sidebar.code("0xa63dC4a463E1F82314bFbC29DE87234c49d42dbF", language="text")
+
+st.sidebar.markdown("**Litecoin (LTC)**")
+st.sidebar.code("ltc1qfc7pvc072rq0arc7ewz84jh0z7lwwtk7nhe84q", language="text")
+
+st.sidebar.markdown("**PayPal USD (PYUSD / EVM)**")
+st.sidebar.code("0x2E49F25Ef7BA15E939402589B0F6C1338FB14285", language="text")
 
 # === ПРОВЕРКА КЛЮЧА API ===
 api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
