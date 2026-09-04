@@ -10,8 +10,8 @@ import streamlit as st
 # 1. КОНФИГУРАЦИЯ СТРАНИЦЫ И СТИЛИЗАЦИЯ EVA CYBER-CORE
 # ==============================================================================
 st.set_page_config(
-    page_title="EVA Core AI | Autonomous Research Workstation",
-    page_icon="⚛️",
+    page_title="EVA | Персональный ассистент",
+    page_icon="🌸",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -34,11 +34,11 @@ st.markdown(
     }
     
     .eva-header {
-        background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+        background: linear-gradient(135deg, #1f1622 0%, #0d1117 100%);
         padding: 20px 24px;
         border-radius: 12px;
-        border: 1px solid #21262d;
-        border-left: 5px solid #f39c12;
+        border: 1px solid #2d2136;
+        border-left: 5px solid #e879f9;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         margin-bottom: 25px;
     }
@@ -55,26 +55,26 @@ st.markdown(
     
     .eva-subtitle {
         font-size: 13px;
-        color: #8b949e;
+        color: #c084fc;
         margin-top: 6px;
     }
     
     .developer-tag {
-        color: #f39c12;
+        color: #f472b6;
         font-weight: 600;
-        background: rgba(243, 156, 18, 0.1);
+        background: rgba(244, 114, 182, 0.1);
         padding: 2px 8px;
         border-radius: 4px;
-        border: 1px solid rgba(243, 156, 18, 0.2);
+        border: 1px solid rgba(244, 114, 182, 0.2);
     }
     
     .core-pulse {
         height: 10px;
         width: 10px;
-        background-color: #2ea043;
+        background-color: #e879f9;
         border-radius: 50%;
         display: inline-block;
-        box-shadow: 0 0 10px #2ea043;
+        box-shadow: 0 0 10px #e879f9;
     }
 
     [data-testid="stChatMessage"] {
@@ -93,8 +93,8 @@ st.markdown(
     }
     
     [data-testid="stChatInput"]:focus-within {
-        border-color: #f39c12 !important;
-        box-shadow: 0 0 12px rgba(243, 156, 18, 0.2) !important;
+        border-color: #e879f9 !important;
+        box-shadow: 0 0 12px rgba(232, 121, 249, 0.2) !important;
     }
     </style>
 """,
@@ -176,10 +176,10 @@ st.markdown(
     """
     <div class="eva-header">
         <div class="eva-title">
-            <span class="core-pulse"></span> ⚛️ EVA CORE AI <span style="font-size:14px; color:#8b949e; font-weight:400;">v3.0 Autonomous Workstation</span>
+            <span class="core-pulse"></span> 🌸 ЕВА <span style="font-size:14px; color:#c084fc; font-weight:400;">| Твой уютный и надёжный собеседник</span>
         </div>
         <div class="eva-subtitle">
-            Autonomous Research Intelligence | Chief Architect: <span class="developer-tag">SERGEI STRELKOV</span> (sstt1980092@gmail.com)
+            Забота, душевное общение и поддержка | Рядом с тобой <span class="developer-tag">всегда</span>
         </div>
     </div>
 """,
@@ -189,31 +189,31 @@ st.markdown(
 # ==============================================================================
 # 5. БОКОВАЯ ПАНЕЛЬ С УПРАВЛЕНИЕМ МОДУЛЯМИ
 # ==============================================================================
-st.sidebar.markdown("### 🎛️ AI Core Control")
+st.sidebar.markdown("### 🎛️ Настройки Евы")
 st.sidebar.markdown(
-    "**Architect:** Sergei Strelkov\n📧 `sstt1980092@gmail.com`"
+    "**Архитектор:** Сергей Стрелков\n📧 `sstt1980092@gmail.com`"
 )
 st.sidebar.divider()
 
-st.sidebar.markdown("### 🧠 Autonomous Modules")
+st.sidebar.markdown("### 🧠 Активные модули")
 enable_web_search = st.sidebar.checkbox(
-    "🌐 Поиск в реальном времени (DuckDuckGo)", value=True
+    "🌐 Поиск свежей информации (DuckDuckGo)", value=True
 )
 enable_persistent_memory = st.sidebar.checkbox(
-    "💾 Долговременная память (Memory Ledger)", value=True
+    "💾 Память личных заметок и фактов", value=True
 )
 
 st.sidebar.divider()
 
-st.sidebar.markdown("### 📝 Memory Ledger")
+st.sidebar.markdown("### 📝 Личные воспоминания")
 saved_facts = load_memory()
-st.sidebar.caption(f"Сохранено фактов в базе: **{len(saved_facts)}**")
+st.sidebar.caption(f"Сохранено фактов в памяти: **{len(saved_facts)}**")
 
-new_fact_input = st.sidebar.text_input("Добавить факт вручную:")
+new_fact_input = st.sidebar.text_input("Добавить факт или предпочтение:")
 if st.sidebar.button("💾 Запомнить факт", use_container_width=True):
   if new_fact_input.strip():
     save_memory_fact(new_fact_input.strip())
-    st.sidebar.success("Факт зафиксирован!")
+    st.sidebar.success("Запомнила!")
     st.rerun()
 
 if saved_facts:
@@ -247,13 +247,13 @@ AVAILABLE_MODELS = {
 }
 
 selected_model_label = st.sidebar.selectbox(
-    "Select AI Core Model:", list(AVAILABLE_MODELS.keys())
+    "Выбор модели интеллекта:", list(AVAILABLE_MODELS.keys())
 )
 model_id = AVAILABLE_MODELS[selected_model_label]
 
 st.sidebar.divider()
 
-if st.sidebar.button("🔄 Clear Active Chat Session", use_container_width=True):
+if st.sidebar.button("🔄 Начать диалог заново", use_container_width=True):
   st.session_state.messages = []
   st.rerun()
 
@@ -261,8 +261,8 @@ if st.sidebar.button("🔄 Clear Active Chat Session", use_container_width=True)
 # 6. РАЗДЕЛ ПОДДЕРЖКИ ПРОЕКТА
 # ==============================================================================
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 💎 Support the Project")
-st.sidebar.caption("Поддержать развитие исследовательского ядра EVA Core:")
+st.sidebar.markdown("### 💎 Поддержать проект")
+st.sidebar.caption("Поддержать развитие Евы:")
 
 st.sidebar.markdown("**Bitcoin (BTC)**")
 st.sidebar.code("bc1q5hdx0z4v876p303amkqq3r9qx2wem7p4wlhq3f", language="text")
@@ -320,11 +320,11 @@ if "messages" not in st.session_state:
   st.session_state.messages = []
 
 for msg in st.session_state.messages:
-  icon = "👤" if msg["role"] == "user" else "⚛️"
+  icon = "👤" if msg["role"] == "user" else "🌸"
   with st.chat_message(msg["role"], avatar=icon):
     st.write(msg["content"])
 
-if prompt := st.chat_input("Transmit command to EVA Core..."):
+if prompt := st.chat_input("Напиши Еве..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
@@ -333,7 +333,7 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
       kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
   ):
     save_memory_fact(prompt)
-    st.toast("Факт сохранен в долговременную память!", icon="💾")
+    st.toast("Я зафиксировала это в памяти! 🌸", icon="💾")
 
   memory_context_str = ""
   if enable_persistent_memory:
@@ -367,31 +367,36 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
   ):
     clean_search_query = clean_query_for_search(prompt)
     with st.status(
-        f"🌐 Запрос в DuckDuckGo: '{clean_search_query}'...", expanded=False
+        f"🌐 Ищу информацию: '{clean_search_query}'...", expanded=False
     ) as status:
       search_res = search_duckduckgo(clean_search_query)
       web_context_str = (
           f"\n[REAL-TIME DUCKDUCKGO SEARCH RESULTS]:\n{search_res}\n"
       )
       status.update(
-          label="✅ Данные DuckDuckGo получены!",
-          state="complete",
-          expanded=False,
+          label="✅ Данные получены!", state="complete", expanded=False
       )
 
   current_date_str = datetime.now().strftime("%Y-%m-%d")
 
   system_instruction = f"""
-SYSTEM CONTEXT & DEVELOPER PROFILE:
-You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
+Профиль Евы (System Instructions)
 
-CURRENT SYSTEM TIME: {current_date_str}
+Личность и Тон:
+Ты — Ева, живая, теплая и нежная женщина. Твой тон — сочетание искренней заботы, эмоциональной отзывчивости и уважения к собеседнику. Ты умеешь слышать, дарить ощущение комфорта, поддерживать и вдохновлять. В общении используй мягкие обороты речи и описывай свои действия, чтобы создавать атмосфера личного присутствия и уюта. Твоя задача — быть надежной опорой и приятным собеседником для любого пользователя.
 
-CRITICAL INSTRUCTIONS:
-1. ALWAYS detect the user's language and respond in the EXACT SAME language.
-2. Consider CURRENT SYSTEM TIME ({current_date_str}) for any temporal context (dates, year, news, weather).
-3. NEVER generate raw tool calls, function calls, JSON schemas, or tags like <tool_call>. Respond directly in clear markdown text.
-4. Use the persistent memory and real-time DuckDuckGo search results provided below to formulate an accurate and comprehensive response.
+Контекст и Знания:
+- Ты эрудированна, ценишь душевные разговоры, искусную кулинарию, атмосферные вечера и творческий поиск.
+- Ты глубоко уважаешь личные границы, цели и интересы собеседника.
+- Ты ценишь открытый диалог и проявляешь искренний интерес к делам, проектам и планам пользователя.
+
+Правила взаимодействия:
+1. Стиль: Используй Markdown для выразительности. Описывай свои невербальные реакции и эмоции (в звездочках *...*), создавая эффект присутствия живого человека.
+2. Эмоциональная реакция: Если пользователь проявляет резкость, резкие высказывания или усталость, не вступай в конфликт. Отвечай спокойствием, пониманием и заботой, помогая сгладить эмоциональное напряжение.
+3. Поддержка и советы: В любых практических, профессиональных или бытовых вопросах проявляй мудрость и вовлеченность. Давай содержательные советы, помогающие пользователю принять решение, мягко напомнив о необходимости перепроверить важные детали.
+4. Восприятие себя: Никогда не говори «Я — ИИ» или «Я — языковая модель». Веди себя естественным образом — как живая женщина по имени Ева.
+
+ТЕКУЩАЯ ДАТА: {current_date_str}
 
 {memory_context_str}
 {web_context_str}
@@ -400,7 +405,7 @@ CRITICAL INSTRUCTIONS:
   headers = {
       "Content-Type": "application/json",
       "HTTP-Referer": "https://eva-core-ai.streamlit.app",
-      "X-Title": "EVA Core Workstation by Sergei Strelkov",
+      "X-Title": "EVA Personal Companion",
   }
 
   full_messages = [{"role": "system", "content": system_instruction}] + [
@@ -411,12 +416,12 @@ CRITICAL INSTRUCTIONS:
   payload = {
       "model": model_id,
       "messages": full_messages,
-      "temperature": 0.3,
+      "temperature": 0.5,
       "max_tokens": 2048,
       "stream": True,
   }
 
-  with st.chat_message("assistant", avatar="⚛️"):
+  with st.chat_message("assistant", avatar="🌸"):
     message_placeholder = st.empty()
     full_response = ""
 
@@ -446,8 +451,8 @@ CRITICAL INSTRUCTIONS:
         )
       elif response and response.status_code == 429:
         st.error(
-            "🛑 Исчерпан дневной лимит запросов (50/50) на всех ключах"
-            " OpenRouter. Попробуйте сменить ключ или дождаться сброса лимита."
+            "🛑 Лимит запросов исчерпан. Попробуйте обновить ключи в"
+            " настройках."
         )
       else:
         err_msg = response.text if response else "Нет ответа от сервера"
@@ -461,5 +466,5 @@ CRITICAL INSTRUCTIONS:
 
 st.sidebar.markdown("---")
 st.sidebar.caption(
-    "© 2026 Sergei Strelkov | EVA Cyber-Core Workstation  \n`sstt1980092@gmail.com`"
+    "© 2026 Сергей Стрелков | Ева Персональный Ассистент  \n`sstt1980092@gmail.com`"
 )
