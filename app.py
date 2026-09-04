@@ -27,10 +27,13 @@ if prompt := st.chat_input("Задайте вопрос..."):
   headers = {
       "Authorization": f"Bearer {api_key}",
       "Content-Type": "application/json",
+      "HTTP-Referer": "https://eva-core-ai.streamlit.app",
+      "X-Title": "EVA Core AI",
   }
 
+  # Используем роутер openrouter/free для автовыбора активной бесплатной модели
   payload = {
-      "model": "google/gemma-2-9b-it:free",
+      "model": "openrouter/free",
       "messages": st.session_state.messages,
   }
 
