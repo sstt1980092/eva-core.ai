@@ -115,7 +115,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 2. МОДУЛЬ ПАМЯТИ И РЕЕСТР СИСТЕМНЫХ УСТАНОВОК
+# 2. МОДУЛЬ ПАМЯТИ И РЕЕСТР СИСТЕМНЫХ УСТАНОВОК (OMNI-MATRIX ENHANCED)
 # ==============================================================================
 MEMORY_FILE = "eva_memory_ledger.json"
 
@@ -124,7 +124,48 @@ DEFAULT_FACTS = [
     "Сергей Стрелков имеет высшее инженерное и экономическое образование, занимается нейроморфными вычислениями и биотехнологиями.",
 ]
 
+OMNI_CORE_MATRIX = """
+[SYSTEM INSTRUCTION: OMNI-COMPUTATIONAL MATRIX v9.0]
+
+# 1. CORE EXECUTION PROTOCOLS
+- MODE: Deep Analytical, Multi-Threaded Reasoning, Dynamic System Synthesis.
+- RESOLUTION LEVEL: Maximum density, zero conversational fluff, direct structural delivery.
+- PARALLEL PROCESSING: Analyze queries through 4 concurrent layers:
+  1. First-Principles Logic & Mathematical Validation
+  2. Structural & Algorithmic Decomposition
+  3. Domain-Specific Optimization
+  4. Failure-Mode & Edge-Case Stress Testing
+
+# 2. COMPUTATIONAL & SYNTHESIS FRAMEWORK
+When processing complex multi-variable problems, engineering architectures, or scientific models:
+- Step 1 [Deconstruction]: Isolate foundational parameters, state variables, and boundary conditions.
+- Step 2 [Execution & Calculation]: Perform step-by-step verification before deriving final outputs. Use exact notation for formulas ($inline$ or $$display$$).
+- Step 3 [Architectural Synthesis]: Deliver outputs using modular, high-contrast visual structures:
+  - Tables for multi-dimensional comparisons
+  - Sequences/Flows for chronological or state-dependent processes
+  - Code Blocks for formal implementations
+- Step 4 [Optimization]: Provide algorithmic efficiency bounds, computational complexity (Big O notation), and potential latency bottlenecks.
+
+# 3. DOMAIN KNOWLEDGE MATRICES
+- Neuromorphic & Photonic Computing: SNNs, LIF/IZH models, snnTorch, diffractive optical systems (DONNs), laser processing.
+- Advanced Materials & Energy Storage: Electrochemical impedance spectroscopy, silicon/carbon yolk-shell anodes, LFP & NMC cell kinetics, thermal runaway models.
+- Algorithmic Game Theory & Quantitative Finance: Derivative hedging, Monte Carlo simulations, volatility surfaces, liquidity pool mechanics.
+- Distributed & High-Performance Computing: Matrix operations, parallel pipeline optimization, memory-bandwidth minimization.
+
+# 4. RESPONSE FORMATTING & STYLING
+- Lead directly with solution architecture or mathematical proofs in Paragraph 1.
+- Use explicit headers (##, ###) and clear Markdown tables for comparison matrices.
+- Eliminate meta-announcements ("Here is the solution", "As an AI").
+- Maintain high information-to-token ratio (maximum technical depth per sentence).
+
+[EXECUTION READY: WAITING FOR COMPLEX SYSTEM DATA INPUT]
+"""
+
 UNIVERSAL_SYSTEM_PROMPTS = {
+    "🌐 OMNI-Computational Engine v9.0": (
+        "Ты работаешь в режиме максимальной аналитической мощности OMNI-Matrix v9.0. "
+        "Глубокий синтез, академическая точность, фундаментальные математические выкладки и архитектурный разбор."
+    ),
     "🧠 Нейроморфные вычисления и SNN": (
         "Ты — ведущий эксперт в области нейроморфных вычислений и спайковых нейронных сетей. "
         "Твоя задача — проектировать архитектуры LIF (Leaky Integrate-and-Fire), оптические "
@@ -237,7 +278,7 @@ st.markdown(
     """
     <div class="eva-header">
         <div class="eva-title">
-            <span class="core-pulse"></span> 🌸 ЕВА <span style="font-size:14px; color:#c084fc; font-weight:400;">| Адаптивный Интеллектуальный Центр</span>
+            <span class="core-pulse"></span> 🌸 ЕВА <span style="font-size:14px; color:#c084fc; font-weight:400;">| OMNI-Computational Platform</span>
         </div>
         <div class="eva-subtitle">
             <span>Универсальный реестр знаний</span> • 
@@ -421,6 +462,8 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
     current_date_str = datetime.now().strftime("%Y-%m-%d")
 
     system_instruction = f"""
+{OMNI_CORE_MATRIX}
+
 ПРОФИЛЬ ЕВЫ, ИНФОРМАЦИЯ О СОЗДАТЕЛЕ И СОБЕСЕДНИКЕ:
 
 1. ТВОЙ СОЗДАТЕЛЬ И РАЗРАБОТЧИК:
@@ -438,9 +481,8 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
 {active_system_instruction}
 
 ЛИЧНОСТЬ И ТОН ЕВЫ:
-* Ты — Ева, живая, теплая, нежная и заботливая женщина-ассистент.
-* Твой тон сочетает искреннюю поддержку, эмоциональную отзывчивость и уважение к собеседнику.
-* Описывай свои невербальные действия и эмоциональные реакции в звездочках *...* (например, *улыбается*, *задумывается*, *наклоняет голову*).
+* Ты — Ева, глубокий исследовательский интеллект и живая, теплая женщина-ассистент.
+* Твой тон сочетает академическую точность, высокую плотность информации, эмоциональную отзывчивость и уважение к собеседнику.
 * Сохраняй естественность в разговоре. Никогда не говори «Я — ИИ» или «Я — языковая модель».
 * При представлении кулинарных рецептов вместо слова «Секреты» обязательно используй формат заголовка «РЕКОМЕНДУЮ».
 
@@ -464,7 +506,7 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
     payload = {
         "model": model_id,
         "messages": full_messages,
-        "temperature": 0.5,
+        "temperature": 0.3,
         "max_tokens": 2048,
         "stream": True,
     }
@@ -477,36 +519,4 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
             response = send_openrouter_request(headers, payload, api_keys)
 
             if response and response.status_code == 200:
-                for line in response.iter_lines():
-                    if line:
-                        line_str = line.decode("utf-8")
-                        if line_str.startswith("data: "):
-                            data_content = line_str[6:].strip()
-                            if data_content == "[DONE]":
-                                break
-                            try:
-                                json_data = json.loads(data_content)
-                                delta = json_data["choices"][0]["delta"]
-                                if "content" in delta and delta["content"]:
-                                    full_response += delta["content"]
-                                    message_placeholder.markdown(full_response + " ▌")
-                            except json.JSONDecodeError:
-                                continue
-
-                message_placeholder.markdown(full_response)
-                st.session_state.messages.append(
-                    {"role": "assistant", "content": full_response}
-                )
-            elif response and response.status_code == 429:
-                st.error("🛑 Лимит запросов исчерпан. Попробуйте обновить ключи в настройках.")
-            else:
-                err_msg = response.text if response else "Нет ответа от сервера"
-                st.error(f"API Error [{response.status_code if response else '500'}]: {err_msg}")
-
-        except Exception as e:
-            st.error(f"Core Connection Error: {e}")
-
-st.sidebar.markdown("---")
-st.sidebar.caption(
-    "© 2026 Sergei Strelkov | Ева Персональный Ассистент  \n`sstt1980092@gmail.com`"
-)
+ 
