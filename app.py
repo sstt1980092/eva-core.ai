@@ -14,8 +14,8 @@ st.set_page_config(
 # Заголовок приложения
 st.title("🌌 EVA Core AI")
 st.caption(
-    "Автономная нейросетевая система с поддержкой флагманских LLM и"
-    " потоковой генерацией.\n**Разработчик:** Sergei Strelkov"
+    "Автономная нейросетевая система с поддержкой бесплатных LLM и потоковой"
+    " генерацией.\n**Разработчик:** Sergei Strelkov"
 )
 
 # === БОКОВАЯ ПАНЕЛЬ: Управление и выбор моделей ===
@@ -23,24 +23,29 @@ st.sidebar.title("🎛️ Центр Управления")
 st.sidebar.markdown("**Создатель:** Sergei Strelkov")
 st.sidebar.divider()
 
-# Рабочий список моделей для OpenRouter
+# Проверенные бесплатные модели OpenRouter
 AVAILABLE_MODELS = {
-    "🌐 OpenRouter Free (Автоподбор бесплатной модели)": "openrouter/free",
-    "🚀 Gemini 2.0 Flash Lite (Free / Fast)": (
-        "google/gemini-2.0-flash-lite-preview-02-05:free"
+    "🌐 OpenRouter Free Router (Автовыбор свободной модели)": (
+        "openrouter/free"
     ),
-    "💻 Qwen 2.5 Coder 32B (Free / Code)": (
-        "qwen/qwen-2.5-coder-32b-instruct:free"
+    "🧠 DeepSeek R1 Free (Рассуждения / Math / Code)": (
+        "deepseek/deepseek-r1:free"
     ),
-    "⚡ Llama 3.2 3B (Платная / Нужен баланс)": (
-        "meta-llama/llama-3.2-3b-instruct"
+    "⚡ Gemini 2.0 Flash Experimental (Free / Fast)": (
+        "google/gemini-2.0-flash-exp:free"
     ),
-    "🔥 DeepSeek R1 (Платная / Нужен баланс)": "deepseek/deepseek-r1",
-    "👑 OpenAI GPT-4o (Платная / Нужен баланс)": "openai/gpt-4o",
+    "💻 Qwen 2.5 72B Instruct (Free / Heavyweight LLM)": (
+        "qwen/qwen-2.5-72b-instruct:free"
+    ),
+    "🚀 MiniMax M3 (Free / Multimodal & Fast)": "minimax/minimax-m3:free",
+    "🛡️ NVIDIA Nemotron 3 Ultra (Free / Reasoning)": (
+        "nvidia/nemotron-3-ultra-550b-a55b:free"
+    ),
+    "🔧 Poolside Laguna S 2.1 (Free / Code Agent)": "poolside/laguna-s-2.1:free",
 }
 
 selected_model_label = st.sidebar.selectbox(
-    "Выберите нейросеть:", list(AVAILABLE_MODELS.keys())
+    "Выберите бесплатную нейросеть:", list(AVAILABLE_MODELS.keys())
 )
 model_id = AVAILABLE_MODELS[selected_model_label]
 
