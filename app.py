@@ -23,23 +23,20 @@ st.sidebar.title("🎛️ Центр Управления")
 st.sidebar.markdown("**Создатель:** Sergei Strelkov")
 st.sidebar.divider()
 
-# Гарантированно бесплатные модельки (с суффиксом :free)
+# Рабочий список моделей для OpenRouter
 AVAILABLE_MODELS = {
-    "⚡ Llama 3.2 3B (Free / Ultra Fast)": (
-        "meta-llama/llama-3.2-3b-instruct:free"
-    ),
+    "🌐 OpenRouter Free (Автоподбор бесплатной модели)": "openrouter/free",
     "🚀 Gemini 2.0 Flash Lite (Free / Fast)": (
         "google/gemini-2.0-flash-lite-preview-02-05:free"
     ),
     "💻 Qwen 2.5 Coder 32B (Free / Code)": (
         "qwen/qwen-2.5-coder-32b-instruct:free"
     ),
-    "🌐 OpenRouter Free Router (Только бесплатные)": "openrouter/free",
-    "🔥 DeepSeek R1 (Требуется баланс)": "deepseek/deepseek-r1",
-    "👑 Llama 3.3 70B (Требуется баланс)": (
-        "meta-llama/llama-3.3-70b-instruct"
+    "⚡ Llama 3.2 3B (Платная / Нужен баланс)": (
+        "meta-llama/llama-3.2-3b-instruct"
     ),
-    "🧠 OpenAI GPT-4o (Требуется баланс)": "openai/gpt-4o",
+    "🔥 DeepSeek R1 (Платная / Нужен баланс)": "deepseek/deepseek-r1",
+    "👑 OpenAI GPT-4o (Платная / Нужен баланс)": "openai/gpt-4o",
 }
 
 selected_model_label = st.sidebar.selectbox(
