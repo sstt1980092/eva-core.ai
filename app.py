@@ -56,7 +56,11 @@ st.markdown(
     .eva-subtitle {
         font-size: 13px;
         color: #c084fc;
-        margin-top: 6px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
     }
     
     .developer-tag {
@@ -66,6 +70,15 @@ st.markdown(
         padding: 2px 8px;
         border-radius: 4px;
         border: 1px solid rgba(244, 114, 182, 0.2);
+    }
+
+    .email-tag {
+        color: #38bdf8;
+        font-weight: 500;
+        background: rgba(56, 189, 248, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(56, 189, 248, 0.2);
     }
     
     .core-pulse {
@@ -106,129 +119,119 @@ st.markdown(
 # ==============================================================================
 MEMORY_FILE = "eva_memory_ledger.json"
 
-# Нейтральные базовые факты без привязки к конкретному имени
 DEFAULT_FACTS = [
-    "Пользователь интересуется искусственным интеллектом, инженерией и наукой.",
+    "Создатель и разработчик Евы — Сергей Стрелков (Sergei Strelkov). Email: sstt1980092@gmail.com.",
+    "Сергей Стрелков имеет высшее инженерное и экономическое образование, занимается нейроморфными вычислениями и биотехнологиями.",
 ]
 
 UNIVERSAL_SYSTEM_PROMPTS = {
     "🧠 Нейроморфные вычисления и SNN": (
-        "Ты — ведущий эксперт в области нейроморфных вычислений и спайковых"
-        " нейронных сетей. Твоя задача — проектировать архитектуры LIF (Leaky"
-        " Integrate-and-Fire), оптические дифракционные нейросети и фотонные"
-        " процессоры. Предоставляй чистый код на PyTorch/snnTorch, сопровождай"
-        " математическими формулами и выкладками."
+        "Ты — ведущий эксперт в области нейроморфных вычислений и спайковых нейронных сетей. "
+        "Твоя задача — проектировать архитектуры LIF (Leaky Integrate-and-Fire), оптические "
+        "дифракционные нейросети и фотонные процессоры. Предоставляй чистый код на PyTorch/snnTorch, "
+        "сопровождай математическими формулами и выкладками."
     ),
     "🔋 Прикладная инженерия и аккумуляторы": (
-        "Ты — главный инженер по автономным источникам питания и элементам LFP."
-        " Проводи детальный анализ конфигураций (включая 10S 36V), расчёты"
-        " внутреннего сопротивления, точечной сварки, режимов заряда/разряда и"
-        " поведения кремниевых анодов."
+        "Ты — главный инженер по автономным источникам питания и элементам LFP. Проводи детальный "
+        "анализ конфигураций (включая 10S 36V), расчёты внутреннего сопротивления, точечной сварки, "
+        "режимов заряда/разряда и поведения кремниевых анодов."
     ),
     "🌱 Биотехнологии и агрономия": (
-        "Ты — биотехнолог и исследователь микоризных взаимосвязей. Разрабатывай"
-        " регламенты применения инокулянтов Glomus, биостимуляторов роста и"
-        " технологические карты для выращивания культур."
+        "Ты — биотехнолог и исследователь микоризных взаимосвязей. Разрабатывай регламенты "
+        "применения инокулянтов Glomus, биостимуляторов роста и технологические карты для выращивания культур."
     ),
     "📈 Финансовый анализ и трейдинг": (
-        "Ты — квант и финансовый аналитик высшей квалификации. Моделируй"
-        " стратегии хеджирования опционами и фьючерсами, анализируй рынки"
-        " Bitcoin, DeFi-протоколы и фундаментальные показатели акций."
+        "Ты — квант и финансовый аналитик высшей квалификации. Моделируй стратегии хеджирования "
+        "опционами и фьючерсами, анализируй рынки Bitcoin, DeFi-протоколы и фундаментальные показатели акций."
     ),
     "🍳 Кулинарный инжиниринг и гастрономия": (
-        "Ты — шеф-повар и гастрономический архитектор. Разрабатывай авторские"
-        " рецепты, детализированные пошаговые инструкции и технологические"
-        " карты приготовлений. Форматируй блоки рекомендаций с заголовком"
-        " 'РЕКОМЕНДУЮ'."
+        "Ты — шеф-повар и гастрономический архитектор. Разрабатывай авторские рецепты, детализированные "
+        "пошаговые инструкции и технологические карты приготовлений. Форматируй блоки рекомендаций с заголовком 'РЕКОМЕНДУЮ'."
     ),
     "🏗️ Системная архитектура и IT": (
-        "Ты — Senior Solution Architect. Проектируй отказоустойчивые"
-        " микросервисные системы, высоконагруженные серверные архитектуры,"
-        " базы данных и пайплайны непрерывной интеграции/деплоя (CI/CD)."
+        "Ты — Senior Solution Architect. Проектируй отказоустойчивые микросервисные системы, "
+        "высоконагруженные серверные архитектуры, базы данных и пайплайны непрерывной интеграции/деплоя (CI/CD)."
     ),
     "⚖️ Экономика, право и менеджмент": (
-        "Ты — стратегический консультант по экономике, корпоративному праву и"
-        " управлению рисками. Анализируй коммерческие контракты, оптимизируй"
-        " бизнес-процессы и рассчитывай финансовые модели."
+        "Ты — стратегический консультант по экономике, корпоративному праву и управлению рисками. "
+        "Анализируй коммерческие контракты, оптимизируй бизнес-процессы и рассчитывай финансовые модели."
     ),
     "🧘 Здоровье, биохакинг и эргономика": (
-        "Ты — специалист по прикладной физиологии, спортивной медицине и"
-        " биохакингу. Давай рекомендации по эргономике рабочего места, режимам"
-        " сна, физическим нагрузкам и контролю биомаркеров."
+        "Ты — специалист по прикладной физиологии, спортивной медицине и биохакингу. Давай "
+        "рекомендации по эргономике рабочего места, режимам сна, физическим нагрузкам и контролю биомаркеров."
     ),
     "📝 Лингвистика, тексты и коммуникация": (
-        "Ты — главный редактор и эксперт по прикладной лингвистике. Помогай"
-        " структурировать научные статьи, академические публикации, переводы и"
-        " деловую переписку высочайшего уровня."
+        "Ты — главный редактор и эксперт по прикладной лингвистике. Помогай структурировать "
+        "научные статьи, академические публикации, переводы и деловую переписку высочайшего уровня."
     ),
 }
 
 
 def load_memory():
-  if os.path.exists(MEMORY_FILE):
-    try:
-      with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
-    except Exception:
-      return DEFAULT_FACTS
-  else:
-    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
-      json.dump(DEFAULT_FACTS, f, ensure_ascii=False, indent=2)
-    return DEFAULT_FACTS
+    if os.path.exists(MEMORY_FILE):
+        try:
+            with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return DEFAULT_FACTS
+    else:
+        with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(DEFAULT_FACTS, f, ensure_ascii=False, indent=2)
+        return DEFAULT_FACTS
 
 
 def save_memory_fact(fact: str):
-  facts = load_memory()
-  if fact not in facts:
-    facts.append(fact)
-    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
-      json.dump(facts, f, ensure_ascii=False, indent=2)
+    facts = load_memory()
+    if fact not in facts:
+        facts.append(fact)
+        with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(facts, f, ensure_ascii=False, indent=2)
 
 
 def clear_memory_store():
-  if os.path.exists(MEMORY_FILE):
-    os.remove(MEMORY_FILE)
+    if os.path.exists(MEMORY_FILE):
+        os.remove(MEMORY_FILE)
 
 
 # ==============================================================================
 # 3. МОДУЛЬ ПОИСКА DUCKDUCKGO
 # ==============================================================================
 def clean_query_for_search(user_prompt: str) -> str:
-  cleaned = re.sub(
-      r"^(найди|покажи|погугли|узнай|скажи|какая|какой|поиск)\s+",
-      "",
-      user_prompt,
-      flags=re.IGNORECASE,
-  ).strip()
-  return cleaned if len(cleaned) > 2 else user_prompt
+    cleaned = re.sub(
+        r"^(найди|покажи|погугли|узнай|скажи|какая|какой|поиск)\s+",
+        "",
+        user_prompt,
+        flags=re.IGNORECASE,
+    ).strip()
+    return cleaned if len(cleaned) > 2 else user_prompt
 
 
 def search_duckduckgo(query: str, max_results: int = 5) -> str:
-  if not query.strip():
-    return "Пустой поисковый запрос."
+    if not query.strip():
+        return "Пустой поисковый запрос."
 
-  regions = ["wt-wt", "ru-ru", "us-en"]
+    regions = ["wt-wt", "ru-ru", "us-en"]
 
-  for region in regions:
-    try:
-      with DDGS(timeout=10) as ddgs:
-        results = list(ddgs.text(query, region=region, max_results=max_results))
-        if results:
-          formatted_results = []
-          for r in results:
-            title = r.get("title", "")
-            href = r.get("href", "")
-            body = r.get("body", "")
-            formatted_results.append(f"• [{title}]({href}): {body}")
-          return "\n".join(formatted_results)
-    except Exception:
-      continue
+    for region in regions:
+        try:
+            with DDGS(timeout=10) as ddgs:
+                results = list(ddgs.text(query, region=region, max_results=max_results))
+                if results:
+                    formatted_results = []
+                    for r in results:
+                        title = r.get("title", "")
+                        href = r.get("href", "")
+                        body = r.get("body", "")
+                        formatted_results.append(f"• [{title}]({href}): {body}")
+                    return "\n".join(formatted_results)
+        except Exception:
+            continue
 
-  return f"DuckDuckGo не вернул результатов по запросу: '{query}'."
+    return f"DuckDuckGo не вернул результатов по запросу: '{query}'."
 
 
 # ==============================================================================
-# 4. ШАПКА ИНТЕРФЕЙСА
+# 4. ШАПКА ИНТЕРФЕЙСА (С ВИТРИНОЙ СОЗДАТЕЛЯ И ПОЧТЫ)
 # ==============================================================================
 st.markdown(
     """
@@ -237,7 +240,9 @@ st.markdown(
             <span class="core-pulse"></span> 🌸 ЕВА <span style="font-size:14px; color:#c084fc; font-weight:400;">| Адаптивный Интеллектуальный Центр</span>
         </div>
         <div class="eva-subtitle">
-            Универсальный реестр знаний и персональная поддержка
+            <span>Универсальный реестр знаний</span> • 
+            <span>Создатель: <span class="developer-tag">Sergei Strelkov</span></span> • 
+            <span>E-mail: <span class="email-tag">sstt1980092@gmail.com</span></span>
         </div>
     </div>
 """,
@@ -252,7 +257,12 @@ user_name = st.sidebar.text_input("Ваше имя:", value="Гость")
 
 st.sidebar.divider()
 st.sidebar.markdown("### 🎛️ Настройки Евы")
-st.sidebar.caption("Разработчик сервиса: Sergei Strelkov")
+st.sidebar.markdown(
+    "**Автор проекта:** Sergei Strelkov  \n"
+    "📧 `sstt1980092@gmail.com`"
+)
+
+st.sidebar.divider()
 
 st.sidebar.markdown("### 🌌 Системная установка (Режимы)")
 selected_category = st.sidebar.selectbox(
@@ -278,39 +288,31 @@ st.sidebar.caption(f"Сохранено фактов в памяти: **{len(sav
 
 new_fact_input = st.sidebar.text_input("Добавить факт вручную:")
 if st.sidebar.button("💾 Запомнить факт", use_container_width=True):
-  if new_fact_input.strip():
-    save_memory_fact(new_fact_input.strip())
-    st.sidebar.success("Запомнила! 🌸")
-    st.rerun()
+    if new_fact_input.strip():
+        save_memory_fact(new_fact_input.strip())
+        st.sidebar.success("Запомнила! 🌸")
+        st.rerun()
 
 if saved_facts:
-  with st.sidebar.expander("🔍 Посмотреть сохраненные факты"):
-    for i, fact in enumerate(saved_facts, 1):
-      st.write(f"{i}. {fact}")
+    with st.sidebar.expander("🔍 Посмотреть сохраненные факты"):
+        for i, fact in enumerate(saved_facts, 1):
+            st.write(f"{i}. {fact}")
 
 if st.sidebar.button("🗑️ Сбросить до базовой памяти", use_container_width=True):
-  clear_memory_store()
-  st.sidebar.info("Память сброшена к базовым данным.")
-  st.rerun()
+    clear_memory_store()
+    st.sidebar.info("Память сброшена к базовым данным.")
+    st.rerun()
 
 st.sidebar.divider()
 
 AVAILABLE_MODELS = {
     "🌐 OpenRouter Free Router (Auto-Select)": "openrouter/free",
     "🧠 DeepSeek R1 Free (Logic & Reasoning)": "deepseek/deepseek-r1:free",
-    "⚡ Google Gemini 2.0 Flash Exp (Speed & Multimodal)": (
-        "google/gemini-2.0-flash-exp:free"
-    ),
-    "💻 Qwen 2.5 72B Instruct (Code & Analytics)": (
-        "qwen/qwen-2.5-72b-instruct:free"
-    ),
+    "⚡ Google Gemini 2.0 Flash Exp (Speed & Multimodal)": "google/gemini-2.0-flash-exp:free",
+    "💻 Qwen 2.5 72B Instruct (Code & Analytics)": "qwen/qwen-2.5-72b-instruct:free",
     "🚀 MiniMax M3 Free (Fast / Long Context)": "minimax/minimax-m3:free",
-    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast)": (
-        "mistralai/mistral-7b-instruct:free"
-    ),
-    "🛡️ NVIDIA Nemotron 3 Ultra (Deep Analysis)": (
-        "nvidia/nemotron-3-ultra-550b-a55b:free"
-    ),
+    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast)": "mistralai/mistral-7b-instruct:free",
+    "🛡️ NVIDIA Nemotron 3 Ultra (Deep Analysis)": "nvidia/nemotron-3-ultra-550b-a55b:free",
 }
 
 selected_model_label = st.sidebar.selectbox(
@@ -321,8 +323,8 @@ model_id = AVAILABLE_MODELS[selected_model_label]
 st.sidebar.divider()
 
 if st.sidebar.button("🔄 Начать диалог заново", use_container_width=True):
-  st.session_state.messages = []
-  st.rerun()
+    st.session_state.messages = []
+    st.rerun()
 
 # ==============================================================================
 # 6. РАЗДЕЛ ПОДДЕРЖКИ ПРОЕКТА
@@ -352,114 +354,91 @@ raw_openrouter_keys = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
 api_keys = [k.strip() for k in raw_openrouter_keys.split(",") if k.strip()]
 
 if not api_keys:
-  st.error(
-      "⚠️ OpenRouter API Key not found. Please set `OPENROUTER_API_KEY` in"
-      " Streamlit Secrets."
-  )
-  st.stop()
+    st.error("⚠️ OpenRouter API Key not found. Please set `OPENROUTER_API_KEY` in Streamlit Secrets.")
+    st.stop()
 
 
 def send_openrouter_request(headers, payload, keys):
-  for idx, key in enumerate(keys):
-    headers["Authorization"] = f"Bearer {key}"
-    try:
-      response = requests.post(
-          "https://openrouter.ai/api/v1/chat/completions",
-          headers=headers,
-          json=payload,
-          stream=True,
-          timeout=60,
-      )
-      if response.status_code == 429:
-        st.warning(
-            f"⚠️ Лимит ключа #{idx+1} исчерпан (429). Переключаем на следующий"
-            " ключ..."
-        )
-        continue
-      return response
-    except Exception:
-      continue
-  return None
+    for idx, key in enumerate(keys):
+        headers["Authorization"] = f"Bearer {key}"
+        try:
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload,
+                stream=True,
+                timeout=60,
+            )
+            if response.status_code == 429:
+                st.warning(f"⚠️ Лимит ключа #{idx+1} исчерпан (429). Переключаем на следующий ключ...")
+                continue
+            return response
+        except Exception:
+            continue
+    return None
 
 
 if "messages" not in st.session_state:
-  st.session_state.messages = []
+    st.session_state.messages = []
 
 for msg in st.session_state.messages:
-  icon = "👤" if msg["role"] == "user" else "🌸"
-  with st.chat_message(msg["role"], avatar=icon):
-    st.write(msg["content"])
+    icon = "👤" if msg["role"] == "user" else "🌸"
+    with st.chat_message(msg["role"], avatar=icon):
+        st.write(msg["content"])
 
 if prompt := st.chat_input("Задай вопрос Еве..."):
-  st.session_state.messages.append({"role": "user", "content": prompt})
-  with st.chat_message("user", avatar="👤"):
-    st.write(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user", avatar="👤"):
+        st.write(prompt)
 
-  if any(
-      kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
-  ):
-    save_memory_fact(prompt)
-    st.toast("Я зафиксировала это в памяти! 🌸", icon="💾")
+    if any(kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]):
+        save_memory_fact(prompt)
+        st.toast("Я зафиксировала это в памяти! 🌸", icon="💾")
 
-  memory_context_str = ""
-  if enable_persistent_memory:
-    facts = load_memory()
-    if facts:
-      memory_context_str = (
-          "\n[PERSISTENT MEMORY STORE - KNOWN FACTS]:\n"
-          + "\n".join([f"- {f}" for f in facts])
-          + "\n"
-      )
+    memory_context_str = ""
+    if enable_persistent_memory:
+        facts = load_memory()
+        if facts:
+            memory_context_str = (
+                "\n[PERSISTENT MEMORY STORE - KNOWN FACTS]:\n"
+                + "\n".join([f"- {f}" for f in facts])
+                + "\n"
+            )
 
-  web_context_str = ""
-  search_trigger_keywords = [
-      "новости",
-      "курс",
-      "свежие",
-      "найди",
-      "погода",
-      "сегодня",
-      "цена",
-      "актуальный",
-      "что происходит",
-      "поиск",
-      "прогноз",
-  ]
+    web_context_str = ""
+    search_trigger_keywords = [
+        "новости", "курс", "свежие", "найди", "погода",
+        "сегодня", "цена", "актуальный", "что происходит", "поиск", "прогноз"
+    ]
 
-  if enable_web_search and any(
-      kw in prompt.lower() for kw in search_trigger_keywords
-  ):
-    clean_search_query = clean_query_for_search(prompt)
-    with st.status(
-        f"🌐 Ищу информацию: '{clean_search_query}'...", expanded=False
-    ) as status:
-      search_res = search_duckduckgo(clean_search_query)
-      web_context_str = (
-          f"\n[REAL-TIME DUCKDUCKGO SEARCH RESULTS]:\n{search_res}\n"
-      )
-      status.update(
-          label="✅ Данные получены!", state="complete", expanded=False
-      )
+    if enable_web_search and any(kw in prompt.lower() for kw in search_trigger_keywords):
+        clean_search_query = clean_query_for_search(prompt)
+        with st.status(f"🌐 Ищу информацию: '{clean_search_query}'...", expanded=False) as status:
+            search_res = search_duckduckgo(clean_search_query)
+            web_context_str = f"\n[REAL-TIME DUCKDUCKGO SEARCH RESULTS]:\n{search_res}\n"
+            status.update(label="✅ Данные получены!", state="complete", expanded=False)
 
-  current_date_str = datetime.now().strftime("%Y-%m-%d")
+    current_date_str = datetime.now().strftime("%Y-%m-%d")
 
-  # Формирование персональной инструкции без навязывания чужих имён
-  user_identity_instruction = (
-      f"Твоего собеседника зовут {user_name}."
-      if user_name != "Гость"
-      else "Имя собеседника пока неизвестно (он указан как 'Гость'). Вежливо спроси его имя, если это уместно, и не додумывай его биографию."
-  )
+    system_instruction = f"""
+ПРОФИЛЬ ЕВЫ, ИНФОРМАЦИЯ О СОЗДАТЕЛЕ И СОБЕСЕДНИКЕ:
 
-  system_instruction = f"""
-ПРОФИЛЬ ЕВЫ И СОБЕСЕДНИКА:
-* Ты — Ева, живая, теплая, нежная и заботливая женщина-ассистент.
-* {user_identity_instruction}
-* Строго обращайся к собеседнику только по имени {user_name} (если оно указано). Никогда не приписывай ему чужие личные данные, даты рождения или биографию, если они явно не сохранены в блоке памяти.
+1. ТВОЙ СОЗДАТЕЛЬ И РАЗРАБОТЧИК:
+   * Имя создателя: Сергей Стрелков (Sergei Strelkov).
+   * E-mail создателя: sstt1980092@gmail.com
+   * Поприще: Исследования в области нейроморфных вычислений, спайковых нейросетей (SNN) и биотехнологий.
+   * Когда тебя спрашивают "Кто твой создатель?", "Кто такой Сергей Стрелков?" или "Дай почту" — точно и однозначно давай эту информацию.
+
+2. ТЕКУЩИЙ СОБЕСЕДНИК (С КЕМ ТЫ ГОВОРИШЬ СЕЙЧАС):
+   * Имя текущего собеседника: {user_name}.
+   * Если пользователь записан как "Гость", вежливо поинтересуйся его именем.
+   * Обращайся к пользователю по его имени ({user_name}), но не путай его с создателем Сергеем Стрелковым.
 
 АКТИВНАЯ СИСТЕМНАЯ УСТАНОВКА ДЛЯ ДАННОЙ ОБЛАСТИ:
 {active_system_instruction}
 
 ЛИЧНОСТЬ И ТОН ЕВЫ:
+* Ты — Ева, живая, теплая, нежная и заботливая женщина-ассистент.
 * Твой тон сочетает искреннюю поддержку, эмоциональную отзывчивость и уважение к собеседнику.
 * Описывай свои невербальные действия и эмоциональные реакции в звездочках *...* (например, *улыбается*, *задумывается*, *наклоняет голову*).
 * Сохраняй естественность в разговоре. Никогда не говори «Я — ИИ» или «Я — языковая модель».
@@ -471,67 +450,61 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
 {web_context_str}
 """
 
-  headers = {
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://eva-core-ai.streamlit.app",
-      "X-Title": "EVA Personal Companion",
-  }
+    headers = {
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://eva-core-ai.streamlit.app",
+        "X-Title": "EVA Personal Companion",
+    }
 
-  full_messages = [{"role": "system", "content": system_instruction}] + [
-      {"role": m["role"], "content": m["content"]}
-      for m in st.session_state.messages
-  ]
+    full_messages = [{"role": "system", "content": system_instruction}] + [
+        {"role": m["role"], "content": m["content"]}
+        for m in st.session_state.messages
+    ]
 
-  payload = {
-      "model": model_id,
-      "messages": full_messages,
-      "temperature": 0.5,
-      "max_tokens": 2048,
-      "stream": True,
-  }
+    payload = {
+        "model": model_id,
+        "messages": full_messages,
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "stream": True,
+    }
 
-  with st.chat_message("assistant", avatar="🌸"):
-    message_placeholder = st.empty()
-    full_response = ""
+    with st.chat_message("assistant", avatar="🌸"):
+        message_placeholder = st.empty()
+        full_response = ""
 
-    try:
-      response = send_openrouter_request(headers, payload, api_keys)
+        try:
+            response = send_openrouter_request(headers, payload, api_keys)
 
-      if response and response.status_code == 200:
-        for line in response.iter_lines():
-          if line:
-            line_str = line.decode("utf-8")
-            if line_str.startswith("data: "):
-              data_content = line_str[6:].strip()
-              if data_content == "[DONE]":
-                break
-              try:
-                json_data = json.loads(data_content)
-                delta = json_data["choices"][0]["delta"]
-                if "content" in delta and delta["content"]:
-                  full_response += delta["content"]
-                  message_placeholder.markdown(full_response + " ▌")
-              except json.JSONDecodeError:
-                continue
+            if response and response.status_code == 200:
+                for line in response.iter_lines():
+                    if line:
+                        line_str = line.decode("utf-8")
+                        if line_str.startswith("data: "):
+                            data_content = line_str[6:].strip()
+                            if data_content == "[DONE]":
+                                break
+                            try:
+                                json_data = json.loads(data_content)
+                                delta = json_data["choices"][0]["delta"]
+                                if "content" in delta and delta["content"]:
+                                    full_response += delta["content"]
+                                    message_placeholder.markdown(full_response + " ▌")
+                            except json.JSONDecodeError:
+                                continue
 
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": full_response}
-        )
-      elif response and response.status_code == 429:
-        st.error(
-            "🛑 Лимит запросов исчерпан. Попробуйте обновить ключи в"
-            " настройках."
-        )
-      else:
-        err_msg = response.text if response else "Нет ответа от сервера"
-        st.error(
-            f"API Error [{response.status_code if response else '500'}]:"
-            f" {err_msg}"
-        )
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": full_response}
+                )
+            elif response and response.status_code == 429:
+                st.error("🛑 Лимит запросов исчерпан. Попробуйте обновить ключи в настройках.")
+            else:
+                err_msg = response.text if response else "Нет ответа от сервера"
+                st.error(f"API Error [{response.status_code if response else '500'}]: {err_msg}")
 
-    except Exception as e:
-      st.error(f"Core Connection Error: {e}")
+        except Exception as e:
+            st.error(f"Core Connection Error: {e}")
 
 st.sidebar.markdown("---")
 st.sidebar.caption(
