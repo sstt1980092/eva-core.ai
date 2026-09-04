@@ -1,5 +1,7 @@
+from datetime import datetime
 import json
 import os
+import re
 import requests
 import streamlit as st
 from duckduckgo_search import DDGS
@@ -129,10 +131,31 @@ def clear_memory_store():
 
 
 # ==============================================================================
-# 3. БЕСПЛАТНЫЙ МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
+# 3. МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
 # ==============================================================================
-def search_duckduckgo(query: str, max_results: int = 4) -> str:
-  """Автономный поиск данных в сети через DuckDuckGo (без использования платного OpenRouter API)."""
+def clean_query_for_search(user_prompt: str) -> str:
+  """Очищает запрос пользователя от мусорных слов и знаков препинания для эффективного поиска."""
+  stop_words = [
+      "найди",
+      "покажи",
+      "поиск",
+      "погугли",
+      "узнай",
+      "скажи",
+      "какая",
+      "какой",
+      "где",
+      "когда",
+  ]
+  query = user_prompt.lower()
+  for word in stop_words:
+    query = re.sub(rf"\b{word}\b", "", query)
+  query = re.sub(r"[^\w\s]", " ", query)
+  return query.strip()
+
+
+def search_duckduckgo(query: str, max_results: int = 5) -> str:
+  """Автономный бесплатный поиск данных в сети через DuckDuckGo."""
   try:
     results = []
     with DDGS() as ddgs:
@@ -141,8 +164,8 @@ def search_duckduckgo(query: str, max_results: int = 4) -> str:
     if results:
       return "\n".join(results)
   except Exception as e:
-    return f"Ошибка при обращении к поисковому движку: {e}"
-  return "Информация по запросу не найдена."
+    return f"Ошибка поискового движка: {e}"
+  return "Результаты по данному запросу в сети не найдены."
 
 
 # ==============================================================================
@@ -269,22 +292,26 @@ if not api_key:
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
+# Отображение диалога
 for msg in st.session_state.messages:
   icon = "👤" if msg["role"] == "user" else "⚛️"
   with st.chat_message(msg["role"], avatar=icon):
     st.write(msg["content"])
 
+# Ввод запроса пользователем
 if prompt := st.chat_input("Transmit command to EVA Core..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
 
+  # Автоматическое запоминание
   if any(
       kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
   ):
     save_memory_fact(prompt)
     st.toast("Факт сохранен в долговременную память!", icon="💾")
 
+  # Контекст памяти
   memory_context_str = ""
   if enable_persistent_memory:
     facts = load_memory()
@@ -295,7 +322,7 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
           + "\n"
       )
 
-  # --- Автономный поиск DuckDuckGo (полностью бесплатный) ---
+  # Модуль веб-поиска
   web_context_str = ""
   search_trigger_keywords = [
       "новости",
@@ -304,32 +331,43 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
       "найди",
       "погода",
       "сегодня",
-      "2026",
       "цена",
       "актуальный",
       "что происходит",
       "поиск",
+      "прогноз",
   ]
+
   if enable_web_search and any(
       kw in prompt.lower() for kw in search_trigger_keywords
   ):
-    with st.status("🔍 Выход в сеть и поиск данных...", expanded=False) as status:
-      search_res = search_duckduckgo(prompt)
+    clean_search_query = clean_query_for_search(prompt)
+    with st.status(
+        f"🌐 Поиск в сети по запросу: '{clean_search_query}'...", expanded=False
+    ) as status:
+      search_res = search_duckduckgo(clean_search_query)
       web_context_str = (
           f"\n[REAL-TIME WEB DATA SEARCH RESULTS]:\n{search_res}\n"
       )
       status.update(
-          label="✅ Поисковые данные получены!", state="complete", expanded=False
+          label="✅ Данные из сети успешно получены!",
+          state="complete",
+          expanded=False,
       )
+
+  # Получение текущей даты
+  current_date_str = datetime.now().strftime("%Y-%m-%d")
 
   system_instruction = f"""
 SYSTEM CONTEXT & DEVELOPER PROFILE:
 You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
 
+CURRENT SYSTEM TIME: {current_date_str}
+
 CRITICAL INSTRUCTIONS:
 1. ALWAYS detect the user's language and respond in the EXACT SAME language.
-2. Use the persistent memory and real-time web results provided below to enrich and perfect your analysis.
-3. Answer with maximum engineering depth, analytical rigor, and accuracy.
+2. Consider CURRENT SYSTEM TIME ({current_date_str}) for any temporal context (dates, year, news, weather).
+3. Use the persistent memory and real-time web search results provided below to formulate an accurate and comprehensive response.
 
 {memory_context_str}
 {web_context_str}
@@ -347,7 +385,6 @@ CRITICAL INSTRUCTIONS:
       for m in st.session_state.messages
   ]
 
-  # Запрос без плагина OpenRouter 'web', чтобы не вызывать ошибку 402 Insufficient credits
   payload = {
       "model": model_id,
       "messages": full_messages,
@@ -398,5 +435,4 @@ CRITICAL INSTRUCTIONS:
 
 st.sidebar.markdown("---")
 st.sidebar.caption(
-    "© 2026 Sergei Strelkov | EVA Cyber-Core Workstation  \n`sstt1980092@gmail.com`"
-)
+    "© 2026 Sergei Strelkov | EVA Cyber-Core Workstation  \n`sstt1980092@gmail.com`")
