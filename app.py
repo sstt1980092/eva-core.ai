@@ -2,9 +2,9 @@ from datetime import datetime
 import json
 import os
 import re
+from duckduckgo_search import DDGS
 import requests
 import streamlit as st
-from duckduckgo_search import DDGS
 
 # ==============================================================================
 # 1. КОНФИГУРАЦИЯ СТРАНИЦЫ И СТИЛИЗАЦИЯ EVA CYBER-CORE
@@ -131,10 +131,10 @@ def clear_memory_store():
 
 
 # ==============================================================================
-# 3. МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
+# 3. МОДУЛЬ БЕСПЛАТНОГО ПОИСКА ЧЕРЕЗ DUCKDUCKGO
 # ==============================================================================
 def clean_query_for_search(user_prompt: str) -> str:
-  """Очищает запрос пользователя от вводных слов и знаков препинания."""
+  """Очищает запрос пользователя от лишних вводных слов."""
   stop_words = [
       "найди",
       "покажи",
@@ -155,17 +155,23 @@ def clean_query_for_search(user_prompt: str) -> str:
 
 
 def search_duckduckgo(query: str, max_results: int = 5) -> str:
-  """Автономный поиск данных через DuckDuckGo."""
+  """Бесплатный поиск через DuckDuckGo Search API."""
   try:
-    results = []
     with DDGS() as ddgs:
-      for r in ddgs.text(query, max_results=max_results):
-        results.append(f"• [{r['title']}]({r['href']}): {r['body']}")
-    if results:
-      return "\n".join(results)
+      results = list(ddgs.text(query, max_results=max_results))
+      if not results:
+        return "DuckDuckGo не вернул результатов по этому запросу."
+
+      formatted_results = []
+      for r in results:
+        title = r.get("title", "")
+        href = r.get("href", "")
+        body = r.get("body", "")
+        formatted_results.append(f"• [{title}]({href}): {body}")
+
+      return "\n".join(formatted_results)
   except Exception as e:
-    return f"Ошибка поискового движка: {e}"
-  return "Результаты по данному запросу в сети не найдены."
+    return f"Ошибка поиска DuckDuckGo: {e}"
 
 
 # ==============================================================================
@@ -186,7 +192,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 5. БОКОВАЯ ПАНЕЛЬ
+# 5. БОКОВАЯ ПАНЕЛЬ С УПРАВЛЕНИЕМ МОДУЛЯМИ
 # ==============================================================================
 st.sidebar.markdown("### 🎛️ AI Core Control")
 st.sidebar.markdown(
@@ -196,7 +202,7 @@ st.sidebar.divider()
 
 st.sidebar.markdown("### 🧠 Autonomous Modules")
 enable_web_search = st.sidebar.checkbox(
-    "🌐 Поиск в реальном времени (Web Search)", value=True
+    "🌐 Поиск в реальном времени (DuckDuckGo)", value=True
 )
 enable_persistent_memory = st.sidebar.checkbox(
     "💾 Долговременная память (Memory Ledger)", value=True
@@ -257,7 +263,7 @@ if st.sidebar.button("🔄 Clear Active Chat Session", use_container_width=True)
   st.rerun()
 
 # ==============================================================================
-# 6. РАЗДЕЛ ПОДДЕРЖКИ ПРОЕКТА (КРИПТОВАЛЮТЫ)
+# 6. РАЗДЕЛ ПОДДЕРЖКИ ПРОЕКТА
 # ==============================================================================
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 💎 Support the Project")
@@ -276,18 +282,44 @@ st.sidebar.markdown("**PayPal USD (PYUSD / EVM)**")
 st.sidebar.code("0x2E49F25Ef7BA15E939402589B0F6C1338FB14285", language="text")
 
 # ==============================================================================
-# 7. ОСНОВНАЯ ЛОГИКА
+# 7. ОСНОВНАЯ ЛОГИКА С РОТАЦИЕЙ API-КЛЮЧЕЙ
 # ==============================================================================
-api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
-    "OPENROUTER_API_KEY"
+raw_openrouter_keys = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
+    "OPENROUTER_API_KEY", ""
 )
+api_keys = [k.strip() for k in raw_openrouter_keys.split(",") if k.strip()]
 
-if not api_key:
+if not api_keys:
   st.error(
-      "⚠️ API Key not found. Please set `OPENROUTER_API_KEY` in Streamlit"
-      " Secrets or Environment Variables."
+      "⚠️ OpenRouter API Key not found. Please set `OPENROUTER_API_KEY` in"
+      " Streamlit Secrets."
   )
   st.stop()
+
+
+def send_openrouter_request(headers, payload, keys):
+  """Отправка запроса с обработкой лимита 429 и ротацией ключей."""
+  for idx, key in enumerate(keys):
+    headers["Authorization"] = f"Bearer {key}"
+    try:
+      response = requests.post(
+          "https://openrouter.ai/api/v1/chat/completions",
+          headers=headers,
+          json=payload,
+          stream=True,
+          timeout=60,
+      )
+      if response.status_code == 429:
+        st.warning(
+            f"⚠️ Лимит ключа #{idx+1} исчерпан (429). Переключаем на следующий"
+            " ключ..."
+        )
+        continue
+      return response
+    except Exception:
+      continue
+  return None
+
 
 if "messages" not in st.session_state:
   st.session_state.messages = []
@@ -340,14 +372,14 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
   ):
     clean_search_query = clean_query_for_search(prompt)
     with st.status(
-        f"🌐 Поиск в сети по запросу: '{clean_search_query}'...", expanded=False
+        f"🌐 Запрос в DuckDuckGo: '{clean_search_query}'...", expanded=False
     ) as status:
       search_res = search_duckduckgo(clean_search_query)
       web_context_str = (
-          f"\n[REAL-TIME WEB DATA SEARCH RESULTS]:\n{search_res}\n"
+          f"\n[REAL-TIME DUCKDUCKGO SEARCH RESULTS]:\n{search_res}\n"
       )
       status.update(
-          label="✅ Данные из сети успешно получены!",
+          label="✅ Данные DuckDuckGo получены!",
           state="complete",
           expanded=False,
       )
@@ -364,14 +396,13 @@ CRITICAL INSTRUCTIONS:
 1. ALWAYS detect the user's language and respond in the EXACT SAME language.
 2. Consider CURRENT SYSTEM TIME ({current_date_str}) for any temporal context (dates, year, news, weather).
 3. NEVER generate raw tool calls, function calls, JSON schemas, or tags like <tool_call>. Respond directly in clear markdown text.
-4. Use the persistent memory and real-time web search results provided below to formulate an accurate and comprehensive response.
+4. Use the persistent memory and real-time DuckDuckGo search results provided below to formulate an accurate and comprehensive response.
 
 {memory_context_str}
 {web_context_str}
 """
 
   headers = {
-      "Authorization": f"Bearer {api_key}",
       "Content-Type": "application/json",
       "HTTP-Referer": "https://eva-core-ai.streamlit.app",
       "X-Title": "EVA Core Workstation by Sergei Strelkov",
@@ -395,15 +426,9 @@ CRITICAL INSTRUCTIONS:
     full_response = ""
 
     try:
-      response = requests.post(
-          "https://openrouter.ai/api/v1/chat/completions",
-          headers=headers,
-          json=payload,
-          stream=True,
-          timeout=60,
-      )
+      response = send_openrouter_request(headers, payload, api_keys)
 
-      if response.status_code == 200:
+      if response and response.status_code == 200:
         for line in response.iter_lines():
           if line:
             line_str = line.decode("utf-8")
@@ -424,8 +449,17 @@ CRITICAL INSTRUCTIONS:
         st.session_state.messages.append(
             {"role": "assistant", "content": full_response}
         )
+      elif response and response.status_code == 429:
+        st.error(
+            "🛑 Исчерпан дневной лимит запросов (50/50) на всех ключах"
+            " OpenRouter. Попробуйте сменить ключ или дождаться сброса лимита."
+        )
       else:
-        st.error(f"API Error [{response.status_code}]: {response.text}")
+        err_msg = response.text if response else "Нет ответа от сервера"
+        st.error(
+            f"API Error [{response.status_code if response else '500'}]:"
+            f" {err_msg}"
+        )
 
     except Exception as e:
       st.error(f"Core Connection Error: {e}")
