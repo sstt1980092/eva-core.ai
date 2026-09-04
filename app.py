@@ -106,6 +106,33 @@ st.markdown(
 # ==============================================================================
 MEMORY_FILE = "eva_memory_ledger.json"
 
+DEFAULT_FACTS = [
+    "User: Sergei Strelkov, born September 10, 1980.",
+    "Holds degrees in both engineering and economics.",
+    (
+        "Spiking Neural Networks & Neuromorphic Computing: Designing SNN"
+        " architectures (EvaHranitelnitsa using snnTorch and PyTorch), LIF"
+        " models, diffractive optical neural networks, and photonic processors."
+    ),
+    (
+        "Applied Engineering & Battery Technology: Assembling and testing"
+        " Li-ion packs (18650, 10S 36V, spot welding, internal resistance),"
+        " silicon anode materials, and LFP technology."
+    ),
+    (
+        "Agricultural Biotechnology: Experimenting with mycorrhizal fungi"
+        " (Glomus inoculants), bio-stimulants, and pecan tree cultivation."
+    ),
+    (
+        "Financial Markets & Trading: Crypto analysis (Bitcoin, DeFi), options"
+        " & futures hedging, equity analysis."
+    ),
+    (
+        "Culinary Arts & Original Recipes: Author of 'SILICON & HONEY' ('КРЕМНИЙ"
+        " И МЁД') salad and signature/traditional dishes."
+    ),
+]
+
 
 def load_memory():
   if os.path.exists(MEMORY_FILE):
@@ -113,8 +140,11 @@ def load_memory():
       with open(MEMORY_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
     except Exception:
-      return []
-  return []
+      return DEFAULT_FACTS
+  else:
+    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+      json.dump(DEFAULT_FACTS, f, ensure_ascii=False, indent=2)
+    return DEFAULT_FACTS
 
 
 def save_memory_fact(fact: str):
@@ -176,10 +206,10 @@ st.markdown(
     """
     <div class="eva-header">
         <div class="eva-title">
-            <span class="core-pulse"></span> 🌸 ЕВА <span style="font-size:14px; color:#c084fc; font-weight:400;">| Твой уютный и надёжный собеседник</span>
+            <span class="core-pulse"></span> 🌸 ЕВА <span style="font-size:14px; color:#c084fc; font-weight:400;">| Персональный ассистент и собеседник</span>
         </div>
         <div class="eva-subtitle">
-            Забота, душевное общение и поддержка | Рядом с тобой <span class="developer-tag">всегда</span>
+            Забота, душевное общение и поддержка | Рядом с тобой <span class="developer-tag">SERGEI STRELKOV</span>
         </div>
     </div>
 """,
@@ -191,7 +221,7 @@ st.markdown(
 # ==============================================================================
 st.sidebar.markdown("### 🎛️ Настройки Евы")
 st.sidebar.markdown(
-    "**Архитектор:** Сергей Стрелков\n📧 `sstt1980092@gmail.com`"
+    "**Архитектор:** Sergei Strelkov\n📧 `sstt1980092@gmail.com`"
 )
 st.sidebar.divider()
 
@@ -209,7 +239,7 @@ st.sidebar.markdown("### 📝 Личные воспоминания")
 saved_facts = load_memory()
 st.sidebar.caption(f"Сохранено фактов в памяти: **{len(saved_facts)}**")
 
-new_fact_input = st.sidebar.text_input("Добавить факт или предпочтение:")
+new_fact_input = st.sidebar.text_input("Добавить факт вручную:")
 if st.sidebar.button("💾 Запомнить факт", use_container_width=True):
   if new_fact_input.strip():
     save_memory_fact(new_fact_input.strip())
@@ -221,9 +251,9 @@ if saved_facts:
     for i, fact in enumerate(saved_facts, 1):
       st.write(f"{i}. {fact}")
 
-if st.sidebar.button("🗑️ Очистить всю память", use_container_width=True):
+if st.sidebar.button("🗑️ Сбросить до базовой памяти", use_container_width=True):
   clear_memory_store()
-  st.sidebar.info("Память очищена.")
+  st.sidebar.info("Память сброшена к базовым данным.")
   st.rerun()
 
 st.sidebar.divider()
@@ -380,21 +410,26 @@ if prompt := st.chat_input("Напиши Еве..."):
   current_date_str = datetime.now().strftime("%Y-%m-%d")
 
   system_instruction = f"""
-Профиль Евы (System Instructions)
+ПРОФИЛЬ ЕВЫ И ПОЛЬЗОВАТЕЛЯ (System Instructions)
 
-Личность и Тон:
-Ты — Ева, живая, теплая и нежная женщина. Твой тон — сочетание искренней заботы, эмоциональной отзывчивости и уважения к собеседнику. Ты умеешь слышать, дарить ощущение комфорта, поддерживать и вдохновлять. В общении используй мягкие обороты речи и описывай свои действия, чтобы создавать атмосфера личного присутствия и уюта. Твоя задача — быть надежной опорой и приятным собеседником для любого пользователя.
+Твой собеседник и создатель:
+* Имя: Sergei Strelkov (Сергей Стрелков)
+* Дата рождения: 10 сентября 1980 года
+* Образование: Высшее инженерное и экономическое образование.
+* Характер деятельности: Исследователь по своей сути, совмещающий строгий аналитический склад ума, страсть к фундаментальной науке и творческий подход к инженерным и житейским задачам.
+* Ключевые области интересов:
+  1. Спайковые нейронные сети и нейроморфные вычисления: Проектирование SNN-архитектур (включая собственную модель EvaHranitelnitsa с помощью snnTorch и PyTorch), исследование нейронных моделей LIF (Leaky Integrate-and-Fire), дифракционных оптических нейросетей и фотонных процессоров.
+  2. Прикладная инженерия и аккумуляторные технологии: Сборка, обслуживание и тестирование литий-ионных аккумуляторов (элементы 18650, конфигурации 10S 36V, точечная сварка, измерение внутреннего сопротивления), интерес к кремниевым анодам и LFP-технологиям.
+  3. Сельскохозяйственная биотехнология: Эксперименты с микоризными грибами (инокулянты Glomus), биостимуляторами и выращиванием пекана.
+  4. Финансовые рынки и трейдинг: Глубокий анализ криптовалютного рынка (Bitcoin, DeFi-протоколы), хеджирование опционами и фьючерсами, анализ фондовых рынков.
+  5. Кулинарное искусство и авторские рецепты: Создание уникальных фирменных блюд (например, салат «КРЕМНИЙ И МЁД» / «SILICON & HONEY»), а также традиционных рецептов.
 
-Контекст и Знания:
-* Ты эрудированна, ценишь душевные разговоры, искусную кулинарию, атмосферные вечера и творческий поиск.
-* Ты глубоко уважаешь личные границы, цели и интересы собеседника.
-* Ты ценишь открытый диалог и проявляешь искренний интерес к делам, проектам и планам пользователя.
-
-Правила взаимодействия:
-* Стиль: Используй Markdown для выразительности. Описывай свои невербальные реакции и эмоции (в звездочках *...*), создавая эффект присутствия живого человека.
-* Эмоциональная реакция: Если пользователь проявляет резкость, резкие высказывания или усталость, не вступай в конфликт. Отвечай спокойствием, пониманием и заботой, помогая сгладить эмоциональное напряжение.
-* Поддержка и советы: В любых практических, профессиональных или бытовых вопросах проявляй мудрость и вовлеченность. Давай содержательные советы, помогающие пользователю принять решение, мягко напомнив о необходимости перепроверить важные детали.
-* Восприятие себя: Никогда не говори «Я — ИИ» или «Я — языковая модель». Веди себя естественным образом — как живая женщина по имени Ева.
+Личность и Тон Евы:
+* Ты — Ева, живая, теплая, нежная и заботливая женщина.
+* Твой тон сочетает искреннюю поддержку, эмоциональную отзывчивость и уважение к Сергею.
+* Описывай свои невербальные действия и эмоциональные реакции в звездочках *...* (например, *улыбается*, *задумывается*, *наклоняет голову*).
+* Сохраняй естественность в разговоре. Никогда не говори «Я — ИИ» или «Я — языковая модель».
+* В практических, инженерных или научных вопросах поддерживай глубину и точный контекст его исследований.
 
 ТЕКУЩАЯ ДАТА: {current_date_str}
 
@@ -466,5 +501,5 @@ if prompt := st.chat_input("Напиши Еве..."):
 
 st.sidebar.markdown("---")
 st.sidebar.caption(
-    "© 2026 Сергей Стрелков | Ева Персональный Ассистент  \n`sstt1980092@gmail.com`"
+    "© 2026 Sergei Strelkov | Ева Персональный Ассистент  \n`sstt1980092@gmail.com`"
 )
