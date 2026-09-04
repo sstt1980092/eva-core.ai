@@ -131,47 +131,42 @@ def clear_memory_store():
 
 
 # ==============================================================================
-# 3. МОДУЛЬ БЕСПЛАТНОГО ПОИСКА ЧЕРЕЗ DUCKDUCKGO
+# 3. НАДЁЖНЫЙ МОДУЛЬ ПОИСКА DUCKDUCKGO
 # ==============================================================================
 def clean_query_for_search(user_prompt: str) -> str:
-  """Очищает запрос пользователя от лишних вводных слов."""
-  stop_words = [
-      "найди",
-      "покажи",
-      "поиск",
-      "погугли",
-      "узнай",
-      "скажи",
-      "какая",
-      "какой",
-      "где",
-      "когда",
-  ]
-  query = user_prompt.lower()
-  for word in stop_words:
-    query = re.sub(rf"\b{word}\b", "", query)
-  query = re.sub(r"[^\w\s]", " ", query)
-  return query.strip()
+  """Аккуратная очистка запроса от команд без потери смысловых слов."""
+  cleaned = re.sub(
+      r"^(найди|покажи|погугли|узнай|скажи|какая|какой|поиск)\s+",
+      "",
+      user_prompt,
+      flags=re.IGNORECASE,
+  ).strip()
+  return cleaned if len(cleaned) > 2 else user_prompt
 
 
 def search_duckduckgo(query: str, max_results: int = 5) -> str:
-  """Бесплатный поиск через DuckDuckGo Search API."""
-  try:
-    with DDGS() as ddgs:
-      results = list(ddgs.text(query, max_results=max_results))
-      if not results:
-        return "DuckDuckGo не вернул результатов по этому запросу."
+  """Устойчивый поиск в DuckDuckGo с перебором регионов."""
+  if not query.strip():
+    return "Пустой поисковый запрос."
 
-      formatted_results = []
-      for r in results:
-        title = r.get("title", "")
-        href = r.get("href", "")
-        body = r.get("body", "")
-        formatted_results.append(f"• [{title}]({href}): {body}")
+  regions = ["wt-wt", "ru-ru", "us-en"]
 
-      return "\n".join(formatted_results)
-  except Exception as e:
-    return f"Ошибка поиска DuckDuckGo: {e}"
+  for region in regions:
+    try:
+      with DDGS(timeout=10) as ddgs:
+        results = list(ddgs.text(query, region=region, max_results=max_results))
+        if results:
+          formatted_results = []
+          for r in results:
+            title = r.get("title", "")
+            href = r.get("href", "")
+            body = r.get("body", "")
+            formatted_results.append(f"• [{title}]({href}): {body}")
+          return "\n".join(formatted_results)
+    except Exception:
+      continue
+
+  return f"DuckDuckGo не вернул результатов по запросу: '{query}'."
 
 
 # ==============================================================================
