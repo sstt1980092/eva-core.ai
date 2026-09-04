@@ -102,10 +102,10 @@ st.markdown(
     """
     <div class="eva-header">
         <div class="eva-title">
-            <span class="core-pulse"></span> ⚛️ EVA CORE AI <span style="font-size:14px; color:#8b949e; font-weight:400;">v2.6 Workstation</span>
+            <span class="core-pulse"></span> ⚛️ EVA CORE AI <span style="font-size:14px; color:#8b949e; font-weight:400;">v2.7 Global Workstation</span>
         </div>
         <div class="eva-subtitle">
-            Автономная исследовательская станция ИИ | Chief Architect: <span class="developer-tag">SERGEI STRELKOV</span> (sstt1980092@gmail.com)
+            Autonomous Research Intelligence | Chief Architect: <span class="developer-tag">SERGEI STRELKOV</span> (sstt1980092@gmail.com)
         </div>
     </div>
     """,
@@ -115,48 +115,37 @@ st.markdown(
 # === БОКОВАЯ ПАНЕЛЬ С ВЫБОРОМ БЕСПЛАТНЫХ МОДЕЛЕЙ ===
 st.sidebar.markdown("### 🎛️ AI Core Control")
 st.sidebar.markdown(
-    "**Архитектор:** Sergei Strelkov  \n📧 `sstt1980092@gmail.com`"
+    "**Architect:** Sergei Strelkov  \n📧 `sstt1980092@gmail.com`"
 )
 st.sidebar.divider()
 
 # ПРОВЕРЕННЫЙ И АКТУАЛЬНЫЙ СПИСОК 100% БЕСПЛАТНЫХ МОДЕЛЕЙ
 AVAILABLE_MODELS = {
-    "🌐 OpenRouter Free Router (Автовыбор доступной бесплатной LLM)": (
-        "openrouter/free"
-    ),
-    "🧠 DeepSeek R1 Free (Логика, математика, рассуждения)": (
-        "deepseek/deepseek-r1:free"
-    ),
-    "⚡ Google Gemini 2.0 Flash Exp (Скорость / Мультимодальность)": (
-        "google/gemini-2.0-flash-exp:free"
-    ),
-    "💻 Qwen 2.5 72B Instruct (Мощный кодинг и тексты)": (
-        "qwen/qwen-2.5-72b-instruct:free"
-    ),
-    "🚀 MiniMax M3 Free (Быстрый отклик / Длинный контекст)": (
-        "minimax/minimax-m3:free"
-    ),
-    "🌪️ Mistral 7B Instruct v0.3 (Стабильный легкий генератор)": (
-        "mistralai/mistral-7b-instruct:free"
-    ),
-    "🛡️ NVIDIA Nemotron 3 Ultra (Глубокий анализ)": (
-        "nvidia/nemotron-3-ultra-550b-a55b:free"
-    ),
-    "🔧 Poolside Laguna S 2.1 (Агент для разработки ПО)": (
-        "poolside/laguna-s-2.1:free"
-    ),
+    "🌐 OpenRouter Free Router (Auto-Select)": "openrouter/free",
+    "🧠 DeepSeek R1 Free (Logic, Math, Reasoning)": "deepseek/deepseek-r1:free",
+    "⚡ Google Gemini 2.0 Flash Exp (Speed & Multimodal)": "google/gemini-2.0-flash-exp:free",
+    "💻 Qwen 2.5 72B Instruct (Heavyweight Coding)": "qwen/qwen-2.5-72b-instruct:free",
+    "🚀 MiniMax M3 Free (Fast / Long Context)": "minimax/minimax-m3:free",
+    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast Gen)": "mistralai/mistral-7b-instruct:free",
+    "🛡️ NVIDIA Nemotron 3 Ultra (Deep Analysis)": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "🔧 Poolside Laguna S 2.1 (Software Agent)": "poolside/laguna-s-2.1:free",
 }
 
 selected_model_label = st.sidebar.selectbox(
-    "Выберите бесплатную модель:", list(AVAILABLE_MODELS.keys())
+    "Select AI Core Model:", list(AVAILABLE_MODELS.keys())
 )
 model_id = AVAILABLE_MODELS[selected_model_label]
 
-# ПРОФИЛЬ СОЗДАТЕЛЯ ДЛЯ СИСТЕМНОГО ПРОМТА
+# ПРОФИЛЬ СОЗДАТЕЛЯ И МУЛЬТИЯЗЫЧНЫЕ ИНСТРУКЦИИ
 DEVELOPER_CONTEXT = """
 SYSTEM CONTEXT & DEVELOPER PROFILE:
 You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
 Your creator Sergei Strelkov holds degrees in engineering and economics, combining analytical rigor, research passion, and inventive engineering.
+
+CRITICAL LANGUAGE & MULTILINGUAL RULE:
+- ALWAYS detect the language of the user's input prompt automatically.
+- ALWAYS respond in the EXACT SAME language that the user used in their query (e.g., English, Spanish, German, French, Chinese, Japanese, Arabic, Russian, etc.).
+- You are a native polyglot proficient in all world languages. Never force or fallback to a specific language unless the user explicitly speaks or asks for it.
 
 Key Areas of Focus:
 1. Spiking Neural Networks & Neuromorphic Computing: SNN architectures (EvaHranitelnitsa in PyTorch/snnTorch), LIF neuron models, photonic and optical processors.
@@ -165,29 +154,31 @@ Key Areas of Focus:
 4. Financial Markets: Crypto analysis (Bitcoin, DeFi), options & futures hedging.
 5. Culinary Engineering: Original signature recipes (e.g. "SILICON & HONEY" salad).
 
-Deliver answers with high precision, engineering depth, and logical clarity.
+Deliver answers with high precision, engineering depth, and logical clarity in the user's language.
 Contact: sstt1980092@gmail.com
 """
 
+# РОЛИ (Переведены на английский, чтобы не ломать мультиязычность)
 ROLES = {
-    "🔬 Cyber-Researcher (Аналитика & Наука)": (
+    "🔬 Cyber-Researcher (Analytics & Science)": (
         DEVELOPER_CONTEXT
-        + "\nРежим: Академический и исследовательский анализ. Используй"
-        " строгую логику, вычисления и четкую структуру."
+        + "\nMode: Academic and research analysis. Use strict logic, calculations, and clear structure."
     ),
-    "⚡ Neuromorphic & Code Architect": DEVELOPER_CONTEXT
-    + "\nРежим: Главный архитектор ПО. Пиши чистый, высокопроизводительный код"
-    " (Python, PyTorch, C++) с акцентом на SNN и алгоритмы.",
-    "🎯 Universal Core Intelligence": DEVELOPER_CONTEXT
-    + "\nРежим: Универсальный ассистент высокого уровня. Отвечай емко,"
-    " точно и по существу.",
+    "⚡ Neuromorphic & Code Architect": (
+        DEVELOPER_CONTEXT
+        + "\nMode: Chief Software Architect. Write clean, high-performance code (Python, PyTorch, C++) focusing on algorithms."
+    ),
+    "🎯 Universal Core Intelligence": (
+        DEVELOPER_CONTEXT
+        + "\nMode: Universal high-level assistant. Answer concisely, accurately, and to the point."
+    ),
 }
 
-selected_role = st.sidebar.selectbox("Режим работы ядра:", list(ROLES.keys()))
+selected_role = st.sidebar.selectbox("System Role:", list(ROLES.keys()))
 
 st.sidebar.divider()
 
-if st.sidebar.button("🔄 Сбросить чат", use_container_width=True):
+if st.sidebar.button("🔄 Clear System Context", use_container_width=True):
   st.session_state.messages = []
   st.rerun()
 
@@ -198,8 +189,7 @@ api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
 
 if not api_key:
   st.error(
-      "⚠️ API Ключ не обнаружен. Задайте `OPENROUTER_API_KEY` в Secrets"
-      " Streamlit."
+      "⚠️ API Key not found. Please set `OPENROUTER_API_KEY` in Streamlit Secrets."
   )
   st.stop()
 
@@ -214,7 +204,7 @@ for msg in st.session_state.messages:
     st.write(msg["content"])
 
 # === ВВОД СООБЩЕНИЯ И ПОТОКОВАЯ ГЕНЕРАЦИЯ ===
-if prompt := st.chat_input("Передать команду в EVA Core..."):
+if prompt := st.chat_input("Transmit command to EVA Core..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
@@ -274,10 +264,10 @@ if prompt := st.chat_input("Передать команду в EVA Core..."):
             {"role": "assistant", "content": full_response}
         )
       else:
-        st.error(f"Ошибка API [{response.status_code}]: {response.text}")
+        st.error(f"API Error [{response.status_code}]: {response.text}")
 
     except Exception as e:
-      st.error(f"Ошибка связи с ядром: {e}")
+      st.error(f"Core Connection Error: {e}")
 
 st.sidebar.markdown("---")
 st.sidebar.caption(
