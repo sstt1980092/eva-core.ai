@@ -52,3 +52,4 @@ if prompt := st.chat_input("Задайте вопрос..."):
         st.error(f"Ошибка API: {response.status_code} - {response.text}")
     except Exception as e:
       st.error(f"Ошибка соединения: {e}")
+        
