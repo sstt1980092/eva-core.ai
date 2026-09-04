@@ -5,7 +5,7 @@ import streamlit as st
 
 # Конфигурация страницы
 st.set_page_config(
-    page_title="EVA Core AI | Ultimate Intelligence",
+    page_title="EVA Core AI | Created by Sergei Strelkov",
     page_icon="🌌",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -15,25 +15,27 @@ st.set_page_config(
 st.title("🌌 EVA Core AI")
 st.caption(
     "Автономная нейросетевая система с поддержкой флагманских LLM и"
-    " потоковой генерацией."
+    " потоковой генерацией.\n**Разработчик:** Sergei Strelkov"
 )
 
 # === БОКОВАЯ ПАНЕЛЬ: Управление и выбор моделей ===
 st.sidebar.title("🎛️ Центр Управления")
+st.sidebar.markdown("**Создатель:** Sergei Strelkov")
+st.sidebar.divider()
 
-# Выбор модели
+# Выбор модели — заменены устаревшие бесплатые эндпоинты
 AVAILABLE_MODELS = {
-    "🔥 DeepSeek R1 (Free / Reasoning)": (
-        "deepseek/deepseek-r1:free"
-    ),
     "⚡ Llama 3.3 70B (Free / Powerful)": (
         "meta-llama/llama-3.3-70b-instruct:free"
     ),
-    "🚀 Gemini Flash 2.0 (Free / Ultra Fast)": (
-        "google/gemini-2.0-flash-exp:free"
+    "🚀 Gemini 2.0 Flash Lite (Free / Fast)": (
+        "google/gemini-2.0-flash-lite-preview-02-05:free"
+    ),
+    "💻 Qwen 2.5 Coder 32B (Free / Code)": (
+        "qwen/qwen-2.5-coder-32b-instruct:free"
     ),
     "🌐 Auto Free Router (Best Available Free)": "openrouter/free",
-    "🧠 Claude 3.5 Sonnet (Pro / Flagship)": "anthropic/claude-3.5-sonnet",
+    "🧠 DeepSeek R1 (Paid / Official)": "deepseek/deepseek-r1",
     "👑 OpenAI GPT-4o (Pro / General)": "openai/gpt-4o",
 }
 
@@ -45,21 +47,24 @@ model_id = AVAILABLE_MODELS[selected_model_label]
 # Выбор специализации (System Prompt)
 ROLES = {
     "Универсальный Разум": (
-        "Ты — EVA Core AI, спрессованный интеллект, способный анализировать"
-        " сложные концепции, находить нестандартные решения и давать максимально"
-        " точные, глубокие ответы."
+        "Ты — EVA Core AI, спрессованный интеллект, созданный разработчиком"
+        " Sergei Strelkov. Твоя задача — анализировать сложные концепции,"
+        " находить нестандартные решения и давать максимально точные, глубокие"
+        " ответы."
     ),
     "Senior Developer & Architect": (
-        "Ты — EVA Core AI, главный архитектор программного обеспечения."
-        " Пиши чистый, оптимизированный и безопасный код с пояснениями."
+        "Ты — EVA Core AI, главный архитектор программного обеспечения, созданный"
+        " Sergei Strelkov. Пиши чистый, оптимизированный и безопасный код с"
+        " пояснениями."
     ),
     "Мастер Промт-Инжиниринга": (
-        "Ты — EVA Core AI, эксперт по составлению идеальных промтов для любых"
-        " нейросетей (ChatGPT, Claude, Midjourney, SD)."
+        "Ты — EVA Core AI, созданный Sergei Strelkov. Ты эксперт по составлению"
+        " идеальных промтов для любых нейросетей (ChatGPT, Claude, Midjourney,"
+        " SD)."
     ),
     "Глубокий Аналитик & Исследователь": (
-        "Ты — EVA Core AI. Твой стиль — строгая логика, критический анализ"
-        " данных, научный подход и структура."
+        "Ты — EVA Core AI, разработанный Sergei Strelkov. Твой стиль — строгая"
+        " логика, критический анализ данных, научный подход и структура."
     ),
 }
 
@@ -101,11 +106,9 @@ for msg in st.session_state.messages:
 
 # === ОБРАБОТКА ВВОДА И СТРИМИНГ ===
 if prompt := st.chat_input("Введите запрос для EVA..."):
-  # Отображение запроса пользователя
   st.session_state.messages.append({"role": "user", "content": prompt})
   st.chat_message("user").write(prompt)
 
-  # Формирование заголовков и полезной нагрузки
   headers = {
       "Authorization": f"Bearer {api_key}",
       "Content-Type": "application/json",
@@ -123,10 +126,9 @@ if prompt := st.chat_input("Введите запрос для EVA..."):
       "messages": full_messages,
       "temperature": temperature,
       "max_tokens": max_tokens,
-      "stream": True,  # Потоковый режим
+      "stream": True,
   }
 
-  # Генерация ответа в реальном времени
   with st.chat_message("assistant"):
     message_placeholder = st.empty()
     full_response = ""
@@ -165,13 +167,14 @@ if prompt := st.chat_input("Введите запрос для EVA..."):
         st.error(f"Ошибка API [{response.status_code}]: {response.text}")
 
     except Exception as e:
-      st.error(f"Ошибка подключения: {e}")
+      st.error(f"Ошибка соединения: {e}")
 
 # === Экспорт истории ===
 if st.session_state.messages:
-  chat_export = "\n\n".join(
-      [f"**{m['role'].capitalize()}**: {m['content']}" for m in st.session_state.messages]
-  )
+  chat_export = "\n\n".join([
+      f"**{m['role'].capitalize()}**: {m['content']}"
+      for m in st.session_state.messages
+  ])
   st.sidebar.download_button(
       label="📥 Скачать диалог (.md)",
       data=chat_export,
@@ -179,4 +182,6 @@ if st.session_state.messages:
       mime="text/markdown",
       use_container_width=True,
   )
-    
+
+st.sidebar.markdown("---")
+st.sidebar.caption("© 2026 Sergei Strelkov. All rights reserved.")
