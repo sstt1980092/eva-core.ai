@@ -2,6 +2,7 @@ import json
 import os
 import requests
 import streamlit as st
+from duckduckgo_search import DDGS
 
 # ==============================================================================
 # 1. КОНФИГУРАЦИЯ СТРАНИЦЫ И СТИЛИЗАЦИЯ EVA CYBER-CORE
@@ -128,26 +129,20 @@ def clear_memory_store():
 
 
 # ==============================================================================
-# 3. МОДУЛЬ ВЕБ-ПОИСКА (REAL-TIME WEB ACCESS)
+# 3. МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
 # ==============================================================================
-def search_duckduckgo(query: str) -> str:
-  """Бесплатный инструмент поиска в сети через DuckDuckGo API."""
+def search_duckduckgo(query: str, max_results: int = 4) -> str:
+  """Автономный поиск данных в сети через DuckDuckGo."""
   try:
-    url = "https://html.duckduckgo.com/html/"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-    response = requests.post(url, data={"q": query}, headers=headers, timeout=10)
-    if response.status_code == 200:
-      from bs4 import BeautifulSoup
-
-      soup = BeautifulSoup(response.text, "html.parser")
-      snippets = []
-      for a in soup.find_all("a", class_="result__snippet", limit=4):
-        snippets.append(a.get_text().strip())
-      if snippets:
-        return "\n".join(snippets)
+    results = []
+    with DDGS() as ddgs:
+      for r in ddgs.text(query, max_results=max_results):
+        results.append(f"• [{r['title']}]({r['href']}): {r['body']}")
+    if results:
+      return "\n".join(results)
   except Exception as e:
-    return f"Ошибка поиска: {e}"
-  return "Актуальная информация по запросу не найдена."
+    return f"Ошибка при обращении к поисковому движку: {e}"
+  return "Информация по запросу не найдена."
 
 
 # ==============================================================================
@@ -289,7 +284,7 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
 
-  # Проверка команды на запоминание
+  # Автоматическое сохранение в память по ключевым фразам
   if any(
       kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
   ):
@@ -307,9 +302,9 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
           + "\n"
       )
 
-  # --- Выход в сеть (Web Search) ---
+  # --- Модуль веб-поиска (DuckDuckGo) ---
   web_context_str = ""
-  search_keywords = [
+  search_trigger_keywords = [
       "новости",
       "курс",
       "свежие",
@@ -319,15 +314,22 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
       "2026",
       "цена",
       "актуальный",
+      "что происходит",
+      "поиск",
   ]
-  if enable_web_search and any(kw in prompt.lower() for kw in search_keywords):
-    with st.status("🔍 Выход в сеть и поиск данных...", expanded=False):
+  if enable_web_search and any(
+      kw in prompt.lower() for kw in search_trigger_keywords
+  ):
+    with st.status("🔍 Выход в сеть и поиск данных...", expanded=False) as status:
       search_res = search_duckduckgo(prompt)
       web_context_str = (
           f"\n[REAL-TIME WEB DATA SEARCH RESULTS]:\n{search_res}\n"
       )
+      status.update(
+          label="✅ Поисковые данные получены!", state="complete", expanded=False
+      )
 
-  # Системные инструкции
+  # Системная инструкция
   system_instruction = f"""
 SYSTEM CONTEXT & DEVELOPER PROFILE:
 You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
@@ -353,12 +355,14 @@ CRITICAL INSTRUCTIONS:
       for m in st.session_state.messages
   ]
 
+  # Включение плагина OpenRouter Web Search + передача сообщений
   payload = {
       "model": model_id,
       "messages": full_messages,
       "temperature": 0.5,
       "max_tokens": 2048,
       "stream": True,
+      "plugins": [{"id": "web"}] if enable_web_search else [],
   }
 
   with st.chat_message("assistant", avatar="⚛️"):
