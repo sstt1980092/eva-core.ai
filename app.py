@@ -30,7 +30,7 @@ if prompt := st.chat_input("Задайте вопрос..."):
   }
 
   payload = {
-      "model": "qwen/qwen-2.5-7b-instruct:free",
+      "model": "google/gemma-2-9b-it:free",
       "messages": st.session_state.messages,
   }
 
@@ -52,4 +52,3 @@ if prompt := st.chat_input("Задайте вопрос..."):
         st.error(f"Ошибка API: {response.status_code} - {response.text}")
     except Exception as e:
       st.error(f"Ошибка соединения: {e}")
-        
