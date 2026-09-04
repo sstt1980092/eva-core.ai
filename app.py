@@ -3,90 +3,191 @@ import os
 import requests
 import streamlit as st
 
-# Конфигурация страницы
+# 1. Конфигурация страницы EVA Cyber-Core
 st.set_page_config(
-    page_title="EVA Core AI | Created by Sergei Strelkov",
-    page_icon="🌌",
+    page_title="EVA Core AI | Cyber-Research Workstation",
+    page_icon="⚛️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# Заголовок приложения
-st.title("🌌 EVA Core AI")
-st.caption(
-    "Автономная нейросетевая система с поддержкой бесплатных LLM и потоковой"
-    " генерацией.\n**Разработчик:** Sergei Strelkov"
+# 2. Кастомный стильный интерфейс EVA Cyber-Core
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #0b0e14;
+        color: #e6edf3;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    [data-testid="stSidebar"] {
+        background-color: #11151c;
+        border-right: 1px solid #1f242d;
+    }
+    
+    .eva-header {
+        background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+        padding: 20px 24px;
+        border-radius: 12px;
+        border: 1px solid #21262d;
+        border-left: 5px solid #f39c12;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        margin-bottom: 25px;
+    }
+    
+    .eva-title {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .eva-subtitle {
+        font-size: 13px;
+        color: #8b949e;
+        margin-top: 6px;
+    }
+    
+    .developer-tag {
+        color: #f39c12;
+        font-weight: 600;
+        background: rgba(243, 156, 18, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(243, 156, 18, 0.2);
+    }
+    
+    .core-pulse {
+        height: 10px;
+        width: 10px;
+        background-color: #2ea043;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 10px #2ea043;
+    }
+
+    [data-testid="stChatMessage"] {
+        background-color: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    
+    [data-testid="stChatInput"] {
+        border-radius: 10px !important;
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
+        color: #c9d1d9 !important;
+    }
+    
+    [data-testid="stChatInput"]:focus-within {
+        border-color: #f39c12 !important;
+        box-shadow: 0 0 12px rgba(243, 156, 18, 0.2) !important;
+    }
+    </style>
+""",
+    unsafe_allow_html=True,
 )
 
-# === БОКОВАЯ ПАНЕЛЬ: Управление и выбор моделей ===
-st.sidebar.title("🎛️ Центр Управления")
-st.sidebar.markdown("**Создатель:** Sergei Strelkov")
+# === ШАПКА ИНТЕРФЕЙСА ===
+st.markdown(
+    """
+    <div class="eva-header">
+        <div class="eva-title">
+            <span class="core-pulse"></span> ⚛️ EVA CORE AI <span style="font-size:14px; color:#8b949e; font-weight:400;">v2.6 Workstation</span>
+        </div>
+        <div class="eva-subtitle">
+            Автономная исследовательская станция ИИ | Chief Architect: <span class="developer-tag">SERGEI STRELKOV</span> (sstt1980092@gmail.com)
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# === БОКОВАЯ ПАНЕЛЬ С ВЫБОРОМ БЕСПЛАТНЫХ МОДЕЛЕЙ ===
+st.sidebar.markdown("### 🎛️ AI Core Control")
+st.sidebar.markdown(
+    "**Архитектор:** Sergei Strelkov  \n📧 `sstt1980092@gmail.com`"
+)
 st.sidebar.divider()
 
-# Проверенные бесплатные модели OpenRouter
+# ПРОВЕРЕННЫЙ И АКТУАЛЬНЫЙ СПИСОК 100% БЕСПЛАТНЫХ МОДЕЛЕЙ
 AVAILABLE_MODELS = {
-    "🌐 OpenRouter Free Router (Автовыбор свободной модели)": (
+    "🌐 OpenRouter Free Router (Автовыбор доступной бесплатной LLM)": (
         "openrouter/free"
     ),
-    "🧠 DeepSeek R1 Free (Рассуждения / Math / Code)": (
+    "🧠 DeepSeek R1 Free (Логика, математика, рассуждения)": (
         "deepseek/deepseek-r1:free"
     ),
-    "⚡ Gemini 2.0 Flash Experimental (Free / Fast)": (
+    "⚡ Google Gemini 2.0 Flash Exp (Скорость / Мультимодальность)": (
         "google/gemini-2.0-flash-exp:free"
     ),
-    "💻 Qwen 2.5 72B Instruct (Free / Heavyweight LLM)": (
+    "💻 Qwen 2.5 72B Instruct (Мощный кодинг и тексты)": (
         "qwen/qwen-2.5-72b-instruct:free"
     ),
-    "🚀 MiniMax M3 (Free / Multimodal & Fast)": "minimax/minimax-m3:free",
-    "🛡️ NVIDIA Nemotron 3 Ultra (Free / Reasoning)": (
+    "🚀 MiniMax M3 Free (Быстрый отклик / Длинный контекст)": (
+        "minimax/minimax-m3:free"
+    ),
+    "🌪️ Mistral 7B Instruct v0.3 (Стабильный легкий генератор)": (
+        "mistralai/mistral-7b-instruct:free"
+    ),
+    "🛡️ NVIDIA Nemotron 3 Ultra (Глубокий анализ)": (
         "nvidia/nemotron-3-ultra-550b-a55b:free"
     ),
-    "🔧 Poolside Laguna S 2.1 (Free / Code Agent)": "poolside/laguna-s-2.1:free",
+    "🔧 Poolside Laguna S 2.1 (Агент для разработки ПО)": (
+        "poolside/laguna-s-2.1:free"
+    ),
 }
 
 selected_model_label = st.sidebar.selectbox(
-    "Выберите бесплатную нейросеть:", list(AVAILABLE_MODELS.keys())
+    "Выберите бесплатную модель:", list(AVAILABLE_MODELS.keys())
 )
 model_id = AVAILABLE_MODELS[selected_model_label]
 
-# Выбор специализации (System Prompt)
+# ПРОФИЛЬ СОЗДАТЕЛЯ ДЛЯ СИСТЕМНОГО ПРОМТА
+DEVELOPER_CONTEXT = """
+SYSTEM CONTEXT & DEVELOPER PROFILE:
+You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
+Your creator Sergei Strelkov holds degrees in engineering and economics, combining analytical rigor, research passion, and inventive engineering.
+
+Key Areas of Focus:
+1. Spiking Neural Networks & Neuromorphic Computing: SNN architectures (EvaHranitelnitsa in PyTorch/snnTorch), LIF neuron models, photonic and optical processors.
+2. Battery Technology & Applied Engineering: Li-ion battery pack design (18650 cells, 10S 36V, spot welding, internal resistance), LFP, silicon anodes.
+3. Agricultural Biotechnology: Mycorrhizal fungi (Glomus inoculants), bio-stimulants, pecan cultivation.
+4. Financial Markets: Crypto analysis (Bitcoin, DeFi), options & futures hedging.
+5. Culinary Engineering: Original signature recipes (e.g. "SILICON & HONEY" salad).
+
+Deliver answers with high precision, engineering depth, and logical clarity.
+Contact: sstt1980092@gmail.com
+"""
+
 ROLES = {
-    "Универсальный Разум": (
-        "Ты — EVA Core AI, спрессованный интеллект, созданный разработчиком"
-        " Sergei Strelkov. Твоя задача — анализировать сложные концепции,"
-        " находить нестандартные решения и давать максимально точные, глубокие"
-        " ответы."
+    "🔬 Cyber-Researcher (Аналитика & Наука)": (
+        DEVELOPER_CONTEXT
+        + "\nРежим: Академический и исследовательский анализ. Используй"
+        " строгую логику, вычисления и четкую структуру."
     ),
-    "Senior Developer & Architect": (
-        "Ты — EVA Core AI, главный архитектор программного обеспечения, созданный"
-        " Sergei Strelkov. Пиши чистый, оптимизированный и безопасный код с"
-        " пояснениями."
-    ),
-    "Мастер Промт-Инжиниринга": (
-        "Ты — EVA Core AI, созданный Sergei Strelkov. Ты эксперт по составлению"
-        " идеальных промтов для любых нейросетей (ChatGPT, Claude, Midjourney,"
-        " SD)."
-    ),
-    "Глубокий Аналитик & Исследователь": (
-        "Ты — EVA Core AI, разработанный Sergei Strelkov. Твой стиль — строгая"
-        " логика, критический анализ данных, научный подход и структура."
-    ),
+    "⚡ Neuromorphic & Code Architect": DEVELOPER_CONTEXT
+    + "\nРежим: Главный архитектор ПО. Пиши чистый, высокопроизводительный код"
+    " (Python, PyTorch, C++) с акцентом на SNN и алгоритмы.",
+    "🎯 Universal Core Intelligence": DEVELOPER_CONTEXT
+    + "\nРежим: Универсальный ассистент высокого уровня. Отвечай емко,"
+    " точно и по существу.",
 }
 
-selected_role = st.sidebar.selectbox("Специализация:", list(ROLES.keys()))
+selected_role = st.sidebar.selectbox("Режим работы ядра:", list(ROLES.keys()))
 
-# Настройки параметров генерации
-st.sidebar.subheader("🎚️ Гиперпараметры")
-temperature = st.sidebar.slider(
-    "Температура (Креативность):", 0.0, 1.0, 0.7, 0.05
-)
-max_tokens = st.sidebar.slider(
-    "Макс. длина ответа:", 256, 4096, 2048, step=256
-)
-
-# Кнопки управления чатом
 st.sidebar.divider()
-if st.sidebar.button("🗑️ Очистить историю", use_container_width=True):
+
+if st.sidebar.button("🔄 Сбросить чат", use_container_width=True):
   st.session_state.messages = []
   st.rerun()
 
@@ -97,7 +198,8 @@ api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
 
 if not api_key:
   st.error(
-      "⚠️ API-ключ не найден! Добавьте `OPENROUTER_API_KEY` в Secrets Streamlit."
+      "⚠️ API Ключ не обнаружен. Задайте `OPENROUTER_API_KEY` в Secrets"
+      " Streamlit."
   )
   st.stop()
 
@@ -105,20 +207,23 @@ if not api_key:
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
-# Отображение истории чата
+# Отображение диалога
 for msg in st.session_state.messages:
-  st.chat_message(msg["role"]).write(msg["content"])
+  icon = "👤" if msg["role"] == "user" else "⚛️"
+  with st.chat_message(msg["role"], avatar=icon):
+    st.write(msg["content"])
 
-# === ОБРАБОТКА ВВОДА И СТРИМИНГ ===
-if prompt := st.chat_input("Введите запрос для EVA..."):
+# === ВВОД СООБЩЕНИЯ И ПОТОКОВАЯ ГЕНЕРАЦИЯ ===
+if prompt := st.chat_input("Передать команду в EVA Core..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
-  st.chat_message("user").write(prompt)
+  with st.chat_message("user", avatar="👤"):
+    st.write(prompt)
 
   headers = {
       "Authorization": f"Bearer {api_key}",
       "Content-Type": "application/json",
       "HTTP-Referer": "https://eva-core-ai.streamlit.app",
-      "X-Title": "EVA Core AI",
+      "X-Title": "EVA Core Workstation by Sergei Strelkov",
   }
 
   full_messages = [{"role": "system", "content": ROLES[selected_role]}] + [
@@ -129,12 +234,12 @@ if prompt := st.chat_input("Введите запрос для EVA..."):
   payload = {
       "model": model_id,
       "messages": full_messages,
-      "temperature": temperature,
-      "max_tokens": max_tokens,
+      "temperature": 0.6,
+      "max_tokens": 2048,
       "stream": True,
   }
 
-  with st.chat_message("assistant"):
+  with st.chat_message("assistant", avatar="⚛️"):
     message_placeholder = st.empty()
     full_response = ""
 
@@ -160,7 +265,7 @@ if prompt := st.chat_input("Введите запрос для EVA..."):
                 delta = json_data["choices"][0]["delta"]
                 if "content" in delta and delta["content"]:
                   full_response += delta["content"]
-                  message_placeholder.markdown(full_response + "▌")
+                  message_placeholder.markdown(full_response + " ▌")
               except json.JSONDecodeError:
                 continue
 
@@ -172,21 +277,9 @@ if prompt := st.chat_input("Введите запрос для EVA..."):
         st.error(f"Ошибка API [{response.status_code}]: {response.text}")
 
     except Exception as e:
-      st.error(f"Ошибка соединения: {e}")
-
-# === Экспорт истории ===
-if st.session_state.messages:
-  chat_export = "\n\n".join([
-      f"**{m['role'].capitalize()}**: {m['content']}"
-      for m in st.session_state.messages
-  ])
-  st.sidebar.download_button(
-      label="📥 Скачать диалог (.md)",
-      data=chat_export,
-      file_name="eva_chat_history.md",
-      mime="text/markdown",
-      use_container_width=True,
-  )
+      st.error(f"Ошибка связи с ядром: {e}")
 
 st.sidebar.markdown("---")
-st.sidebar.caption("© 2026 Sergei Strelkov. All rights reserved.")
+st.sidebar.caption(
+    "© 2026 Sergei Strelkov | EVA Cyber-Core Workstation  \n`sstt1980092@gmail.com`"
+)
