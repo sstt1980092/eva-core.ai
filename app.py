@@ -23,10 +23,13 @@ st.sidebar.title("🎛️ Центр Управления")
 st.sidebar.markdown("**Создатель:** Sergei Strelkov")
 st.sidebar.divider()
 
-# Выбор модели — заменены устаревшие бесплатые эндпоинты
+# В списке только 100% рабочие бесплатные эндпоинты и про-модели
 AVAILABLE_MODELS = {
-    "⚡ Llama 3.3 70B (Free / Powerful)": (
-        "meta-llama/llama-3.3-70b-instruct:free"
+    "🌐 Auto Free Router (Гарантированно бесплатный автовыбор)": (
+        "openrouter/auto"
+    ),
+    "⚡ Llama 3.2 3B (Free / Ultra Fast)": (
+        "meta-llama/llama-3.2-3b-instruct:free"
     ),
     "🚀 Gemini 2.0 Flash Lite (Free / Fast)": (
         "google/gemini-2.0-flash-lite-preview-02-05:free"
@@ -34,9 +37,11 @@ AVAILABLE_MODELS = {
     "💻 Qwen 2.5 Coder 32B (Free / Code)": (
         "qwen/qwen-2.5-coder-32b-instruct:free"
     ),
-    "🌐 Auto Free Router (Best Available Free)": "openrouter/free",
-    "🧠 DeepSeek R1 (Paid / Official)": "deepseek/deepseek-r1",
-    "👑 OpenAI GPT-4o (Pro / General)": "openai/gpt-4o",
+    "🔥 DeepSeek R1 (Paid / Official)": "deepseek/deepseek-r1",
+    "👑 Llama 3.3 70B (Paid / Flagship)": (
+        "meta-llama/llama-3.3-70b-instruct"
+    ),
+    "🧠 OpenAI GPT-4o (Paid / Pro)": "openai/gpt-4o",
 }
 
 selected_model_label = st.sidebar.selectbox(
