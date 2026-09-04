@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 2. Кастомный стильный интерфейс EVA Cyber-Core
+# 2. Кастомный стильный интерфейс EVA Cyber-Core System
 st.markdown(
     """
     <style>
@@ -123,11 +123,19 @@ st.sidebar.divider()
 AVAILABLE_MODELS = {
     "🌐 OpenRouter Free Router (Auto-Select)": "openrouter/free",
     "🧠 DeepSeek R1 Free (Logic, Math, Reasoning)": "deepseek/deepseek-r1:free",
-    "⚡ Google Gemini 2.0 Flash Exp (Speed & Multimodal)": "google/gemini-2.0-flash-exp:free",
-    "💻 Qwen 2.5 72B Instruct (Heavyweight Coding)": "qwen/qwen-2.5-72b-instruct:free",
+    "⚡ Google Gemini 2.0 Flash Exp (Speed & Multimodal)": (
+        "google/gemini-2.0-flash-exp:free"
+    ),
+    "💻 Qwen 2.5 72B Instruct (Heavyweight Coding)": (
+        "qwen/qwen-2.5-72b-instruct:free"
+    ),
     "🚀 MiniMax M3 Free (Fast / Long Context)": "minimax/minimax-m3:free",
-    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast Gen)": "mistralai/mistral-7b-instruct:free",
-    "🛡️ NVIDIA Nemotron 3 Ultra (Deep Analysis)": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast Gen)": (
+        "mistralai/mistral-7b-instruct:free"
+    ),
+    "🛡️ NVIDIA Nemotron 3 Ultra (Deep Analysis)": (
+        "nvidia/nemotron-3-ultra-550b-a55b:free"
+    ),
     "🔧 Poolside Laguna S 2.1 (Software Agent)": "poolside/laguna-s-2.1:free",
 }
 
@@ -158,19 +166,21 @@ Deliver answers with high precision, engineering depth, and logical clarity in t
 Contact: sstt1980092@gmail.com
 """
 
-# РОЛИ (Переведены на английский, чтобы не ломать мультиязычность)
 ROLES = {
     "🔬 Cyber-Researcher (Analytics & Science)": (
         DEVELOPER_CONTEXT
-        + "\nMode: Academic and research analysis. Use strict logic, calculations, and clear structure."
+        + "\nMode: Academic and research analysis. Use strict logic,"
+        " calculations, and clear structure."
     ),
     "⚡ Neuromorphic & Code Architect": (
         DEVELOPER_CONTEXT
-        + "\nMode: Chief Software Architect. Write clean, high-performance code (Python, PyTorch, C++) focusing on algorithms."
+        + "\nMode: Chief Software Architect. Write clean, high-performance"
+        " code (Python, PyTorch, C++) focusing on algorithms."
     ),
     "🎯 Universal Core Intelligence": (
         DEVELOPER_CONTEXT
-        + "\nMode: Universal high-level assistant. Answer concisely, accurately, and to the point."
+        + "\nMode: Universal high-level assistant. Answer concisely,"
+        " accurately, and to the point."
     ),
 }
 
@@ -182,6 +192,29 @@ if st.sidebar.button("🔄 Clear System Context", use_container_width=True):
   st.session_state.messages = []
   st.rerun()
 
+# === БЛОК «ПОДДЕРЖАТЬ ПРОЕКТ» (DONATE) ===
+st.sidebar.divider()
+st.sidebar.markdown("### 💎 Support the Project / Поддержка")
+
+with st.sidebar.expander("☕ Поддержать EVA Core AI", expanded=False):
+  st.markdown(
+      """
+        Если проект вам полезен, вы можете поддержать развитие исследовательской станции:
+        
+        * **Bitcoin (BTC):**  
+        `bc1q5hdx0z4v876p303amkqq3r9qx2wem7p4wlhq3f`
+        
+        * **Ethereum (ETH):**  
+        `0xa63dC4a463E1F82314bFbC29DE87234c49d42dbF`
+        
+        * **Litecoin (LTC):**  
+        `ltc1qfc7pvc072rq0arc7ewz84jh0z7lwwtk7nhe84q`
+        
+        * **PayPal USD (PYUSD / EVM):**  
+        `0x2E49F25Ef7BA15E939402589B0F6C1338FB14285`
+        """
+  )
+
 # === ПРОВЕРКА КЛЮЧА API ===
 api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
     "OPENROUTER_API_KEY"
@@ -189,7 +222,8 @@ api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
 
 if not api_key:
   st.error(
-      "⚠️ API Key not found. Please set `OPENROUTER_API_KEY` in Streamlit Secrets."
+      "⚠️ API Key not found. Please set `OPENROUTER_API_KEY` in Streamlit"
+      " Secrets."
   )
   st.stop()
 
