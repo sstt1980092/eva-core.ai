@@ -129,10 +129,10 @@ def clear_memory_store():
 
 
 # ==============================================================================
-# 3. МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
+# 3. БЕСПЛАТНЫЙ МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
 # ==============================================================================
 def search_duckduckgo(query: str, max_results: int = 4) -> str:
-  """Автономный поиск данных в сети через DuckDuckGo."""
+  """Автономный поиск данных в сети через DuckDuckGo (без использования платного OpenRouter API)."""
   try:
     results = []
     with DDGS() as ddgs:
@@ -171,7 +171,6 @@ st.sidebar.markdown(
 )
 st.sidebar.divider()
 
-# Переключатели модулей автономности
 st.sidebar.markdown("### 🧠 Autonomous Modules")
 enable_web_search = st.sidebar.checkbox(
     "🌐 Поиск в реальном времени (Web Search)", value=True
@@ -182,7 +181,6 @@ enable_persistent_memory = st.sidebar.checkbox(
 
 st.sidebar.divider()
 
-# Управление и просмотр сохраненных фактов
 st.sidebar.markdown("### 📝 Memory Ledger")
 saved_facts = load_memory()
 st.sidebar.caption(f"Сохранено фактов в базе: **{len(saved_facts)}**")
@@ -206,7 +204,6 @@ if st.sidebar.button("🗑️ Очистить всю память", use_contain
 
 st.sidebar.divider()
 
-# Выбор моделей
 AVAILABLE_MODELS = {
     "🌐 OpenRouter Free Router (Auto-Select)": "openrouter/free",
     "🧠 DeepSeek R1 Free (Logic & Reasoning)": "deepseek/deepseek-r1:free",
@@ -272,26 +269,22 @@ if not api_key:
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
-# Отображение диалога
 for msg in st.session_state.messages:
   icon = "👤" if msg["role"] == "user" else "⚛️"
   with st.chat_message(msg["role"], avatar=icon):
     st.write(msg["content"])
 
-# Ввод запроса пользователем
 if prompt := st.chat_input("Transmit command to EVA Core..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
 
-  # Автоматическое сохранение в память по ключевым фразам
   if any(
       kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
   ):
     save_memory_fact(prompt)
     st.toast("Факт сохранен в долговременную память!", icon="💾")
 
-  # --- Сборка контекста памяти ---
   memory_context_str = ""
   if enable_persistent_memory:
     facts = load_memory()
@@ -302,7 +295,7 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
           + "\n"
       )
 
-  # --- Модуль веб-поиска (DuckDuckGo) ---
+  # --- Автономный поиск DuckDuckGo (полностью бесплатный) ---
   web_context_str = ""
   search_trigger_keywords = [
       "новости",
@@ -329,7 +322,6 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
           label="✅ Поисковые данные получены!", state="complete", expanded=False
       )
 
-  # Системная инструкция
   system_instruction = f"""
 SYSTEM CONTEXT & DEVELOPER PROFILE:
 You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
@@ -355,14 +347,13 @@ CRITICAL INSTRUCTIONS:
       for m in st.session_state.messages
   ]
 
-  # Включение плагина OpenRouter Web Search + передача сообщений
+  # Запрос без плагина OpenRouter 'web', чтобы не вызывать ошибку 402 Insufficient credits
   payload = {
       "model": model_id,
       "messages": full_messages,
       "temperature": 0.5,
       "max_tokens": 2048,
       "stream": True,
-      "plugins": [{"id": "web"}] if enable_web_search else [],
   }
 
   with st.chat_message("assistant", avatar="⚛️"):
