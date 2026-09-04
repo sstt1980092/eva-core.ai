@@ -134,7 +134,7 @@ def clear_memory_store():
 # 3. МОДУЛЬ ВЕБ-ПОИСКА (DUCKDUCKGO ENGINE)
 # ==============================================================================
 def clean_query_for_search(user_prompt: str) -> str:
-  """Очищает запрос пользователя от мусорных слов и знаков препинания для эффективного поиска."""
+  """Очищает запрос пользователя от вводных слов и знаков препинания."""
   stop_words = [
       "найди",
       "покажи",
@@ -155,7 +155,7 @@ def clean_query_for_search(user_prompt: str) -> str:
 
 
 def search_duckduckgo(query: str, max_results: int = 5) -> str:
-  """Автономный бесплатный поиск данных в сети через DuckDuckGo."""
+  """Автономный поиск данных через DuckDuckGo."""
   try:
     results = []
     with DDGS() as ddgs:
@@ -186,7 +186,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 5. БОКОВАЯ ПАНЕЛЬ С УПРАВЛЕНИЕМ МОДУЛЯМИ АВТОНОМНОСТИ
+# 5. БОКОВАЯ ПАНЕЛЬ
 # ==============================================================================
 st.sidebar.markdown("### 🎛️ AI Core Control")
 st.sidebar.markdown(
@@ -276,7 +276,7 @@ st.sidebar.markdown("**PayPal USD (PYUSD / EVM)**")
 st.sidebar.code("0x2E49F25Ef7BA15E939402589B0F6C1338FB14285", language="text")
 
 # ==============================================================================
-# 7. ОСНОВНАЯ ЛОГИКА И ВЗАИМОДЕЙСТВИЕ
+# 7. ОСНОВНАЯ ЛОГИКА
 # ==============================================================================
 api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
     "OPENROUTER_API_KEY"
@@ -292,26 +292,22 @@ if not api_key:
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
-# Отображение диалога
 for msg in st.session_state.messages:
   icon = "👤" if msg["role"] == "user" else "⚛️"
   with st.chat_message(msg["role"], avatar=icon):
     st.write(msg["content"])
 
-# Ввод запроса пользователем
 if prompt := st.chat_input("Transmit command to EVA Core..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
 
-  # Автоматическое запоминание
   if any(
       kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
   ):
     save_memory_fact(prompt)
     st.toast("Факт сохранен в долговременную память!", icon="💾")
 
-  # Контекст памяти
   memory_context_str = ""
   if enable_persistent_memory:
     facts = load_memory()
@@ -322,7 +318,6 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
           + "\n"
       )
 
-  # Модуль веб-поиска
   web_context_str = ""
   search_trigger_keywords = [
       "новости",
@@ -336,6 +331,8 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
       "что происходит",
       "поиск",
       "прогноз",
+      "нью йорк",
+      "нью-йорк",
   ]
 
   if enable_web_search and any(
@@ -355,7 +352,6 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
           expanded=False,
       )
 
-  # Получение текущей даты
   current_date_str = datetime.now().strftime("%Y-%m-%d")
 
   system_instruction = f"""
@@ -367,7 +363,8 @@ CURRENT SYSTEM TIME: {current_date_str}
 CRITICAL INSTRUCTIONS:
 1. ALWAYS detect the user's language and respond in the EXACT SAME language.
 2. Consider CURRENT SYSTEM TIME ({current_date_str}) for any temporal context (dates, year, news, weather).
-3. Use the persistent memory and real-time web search results provided below to formulate an accurate and comprehensive response.
+3. NEVER generate raw tool calls, function calls, JSON schemas, or tags like <tool_call>. Respond directly in clear markdown text.
+4. Use the persistent memory and real-time web search results provided below to formulate an accurate and comprehensive response.
 
 {memory_context_str}
 {web_context_str}
@@ -388,7 +385,7 @@ CRITICAL INSTRUCTIONS:
   payload = {
       "model": model_id,
       "messages": full_messages,
-      "temperature": 0.5,
+      "temperature": 0.3,
       "max_tokens": 2048,
       "stream": True,
   }
@@ -435,4 +432,5 @@ CRITICAL INSTRUCTIONS:
 
 st.sidebar.markdown("---")
 st.sidebar.caption(
-    "© 2026 Sergei Strelkov | EVA Cyber-Core Workstation  \n`sstt1980092@gmail.com`")
+    "© 2026 Sergei Strelkov | EVA Cyber-Core Workstation  \n`sstt1980092@gmail.com`"
+)
