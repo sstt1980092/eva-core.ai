@@ -3,15 +3,16 @@ import os
 import requests
 import streamlit as st
 
-# 1. Конфигурация страницы EVA Cyber-Core
+# ==============================================================================
+# 1. КОНФИГУРАЦИЯ СТРАНИЦЫ И СТИЛИЗАЦИЯ EVA CYBER-CORE
+# ==============================================================================
 st.set_page_config(
-    page_title="EVA Core AI | Cyber-Research Workstation",
+    page_title="EVA Core AI | Autonomous Research Workstation",
     page_icon="⚛️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# 2. Кастомный стильный интерфейс EVA Cyber-Core System
 st.markdown(
     """
     <style>
@@ -40,7 +41,7 @@ st.markdown(
     }
     
     .eva-title {
-        font-size: 28px;
+        font-size: 26px;
         font-weight: 700;
         letter-spacing: 1px;
         color: #ffffff;
@@ -73,23 +74,6 @@ st.markdown(
         box-shadow: 0 0 10px #2ea043;
     }
 
-    /* Стилевой блок для гарантированного отображения крипто-поддержки */
-    .crypto-card {
-        background-color: #161b22;
-        border: 1px solid #f39c12;
-        border-radius: 10px;
-        padding: 14px;
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .crypto-title {
-        color: #f39c12;
-        font-weight: bold;
-        font-size: 15px;
-        margin-bottom: 8px;
-    }
-
     [data-testid="stChatMessage"] {
         background-color: #161b22;
         border: 1px solid #21262d;
@@ -114,46 +98,136 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# === ШАПКА ИНТЕРФЕЙСА ===
+# ==============================================================================
+# 2. МОДУЛЬ ПАМЯТИ (PERSISTENT MEMORY LEDGER)
+# ==============================================================================
+MEMORY_FILE = "eva_memory_ledger.json"
+
+
+def load_memory():
+  if os.path.exists(MEMORY_FILE):
+    try:
+      with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+    except Exception:
+      return []
+  return []
+
+
+def save_memory_fact(fact: str):
+  facts = load_memory()
+  if fact not in facts:
+    facts.append(fact)
+    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+      json.dump(facts, f, ensure_ascii=False, indent=2)
+
+
+def clear_memory_store():
+  if os.path.exists(MEMORY_FILE):
+    os.remove(MEMORY_FILE)
+
+
+# ==============================================================================
+# 3. МОДУЛЬ ВЕБ-ПОИСКА (REAL-TIME WEB ACCESS)
+# ==============================================================================
+def search_duckduckgo(query: str) -> str:
+  """Бесплатный инструмент поиска в сети через DuckDuckGo API."""
+  try:
+    url = "https://html.duckduckgo.com/html/"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    response = requests.post(url, data={"q": query}, headers=headers, timeout=10)
+    if response.status_code == 200:
+      from bs4 import BeautifulSoup
+
+      soup = BeautifulSoup(response.text, "html.parser")
+      snippets = []
+      for a in soup.find_all("a", class_="result__snippet", limit=4):
+        snippets.append(a.get_text().strip())
+      if snippets:
+        return "\n".join(snippets)
+  except Exception as e:
+    return f"Ошибка поиска: {e}"
+  return "Актуальная информация по запросу не найдена."
+
+
+# ==============================================================================
+# 4. ШАПКА ИНТЕРФЕЙСА
+# ==============================================================================
 st.markdown(
     """
     <div class="eva-header">
         <div class="eva-title">
-            <span class="core-pulse"></span> ⚛️ EVA CORE AI <span style="font-size:14px; color:#8b949e; font-weight:400;">v2.7 Global Workstation</span>
+            <span class="core-pulse"></span> ⚛️ EVA CORE AI <span style="font-size:14px; color:#8b949e; font-weight:400;">v3.0 Autonomous Workstation</span>
         </div>
         <div class="eva-subtitle">
             Autonomous Research Intelligence | Chief Architect: <span class="developer-tag">SERGEI STRELKOV</span> (sstt1980092@gmail.com)
         </div>
     </div>
-    """,
+""",
     unsafe_allow_html=True,
 )
 
-# === БОКОВАЯ ПАНЕЛЬ С ВЫБОРОМ БЕСПЛАТНЫХ МОДЕЛЕЙ ===
+# ==============================================================================
+# 5. БОКОВАЯ ПАНЕЛЬ С УПРАВЛЕНИЕМ МОДУЛЯМИ АВТОНОМНОСТИ
+# ==============================================================================
 st.sidebar.markdown("### 🎛️ AI Core Control")
 st.sidebar.markdown(
-    "**Architect:** Sergei Strelkov  \n📧 `sstt1980092@gmail.com`"
+    "**Architect:** Sergei Strelkov\n📧 `sstt1980092@gmail.com`"
 )
 st.sidebar.divider()
 
-# ПРОВЕРЕННЫЙ И АКТУАЛЬНЫЙ СПИСОК 100% БЕСПЛАТНЫХ МОДЕЛЕЙ
+# Переключатели модулей автономности
+st.sidebar.markdown("### 🧠 Autonomous Modules")
+enable_web_search = st.sidebar.checkbox(
+    "🌐 Поиск в реальном времени (Web Search)", value=True
+)
+enable_persistent_memory = st.sidebar.checkbox(
+    "💾 Долговременная память (Memory Ledger)", value=True
+)
+
+st.sidebar.divider()
+
+# Управление и просмотр сохраненных фактов
+st.sidebar.markdown("### 📝 Memory Ledger")
+saved_facts = load_memory()
+st.sidebar.caption(f"Сохранено фактов в базе: **{len(saved_facts)}**")
+
+new_fact_input = st.sidebar.text_input("Добавить факт вручную:")
+if st.sidebar.button("💾 Запомнить факт", use_container_width=True):
+  if new_fact_input.strip():
+    save_memory_fact(new_fact_input.strip())
+    st.sidebar.success("Факт зафиксирован!")
+    st.rerun()
+
+if saved_facts:
+  with st.sidebar.expander("🔍 Посмотреть сохраненные факты"):
+    for i, fact in enumerate(saved_facts, 1):
+      st.write(f"{i}. {fact}")
+
+if st.sidebar.button("🗑️ Очистить всю память", use_container_width=True):
+  clear_memory_store()
+  st.sidebar.info("Память очищена.")
+  st.rerun()
+
+st.sidebar.divider()
+
+# Выбор моделей
 AVAILABLE_MODELS = {
     "🌐 OpenRouter Free Router (Auto-Select)": "openrouter/free",
-    "🧠 DeepSeek R1 Free (Logic, Math, Reasoning)": "deepseek/deepseek-r1:free",
+    "🧠 DeepSeek R1 Free (Logic & Reasoning)": "deepseek/deepseek-r1:free",
     "⚡ Google Gemini 2.0 Flash Exp (Speed & Multimodal)": (
         "google/gemini-2.0-flash-exp:free"
     ),
-    "💻 Qwen 2.5 72B Instruct (Heavyweight Coding)": (
+    "💻 Qwen 2.5 72B Instruct (Code & Analytics)": (
         "qwen/qwen-2.5-72b-instruct:free"
     ),
     "🚀 MiniMax M3 Free (Fast / Long Context)": "minimax/minimax-m3:free",
-    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast Gen)": (
+    "🌪️ Mistral 7B Instruct v0.3 (Stable Fast)": (
         "mistralai/mistral-7b-instruct:free"
     ),
     "🛡️ NVIDIA Nemotron 3 Ultra (Deep Analysis)": (
         "nvidia/nemotron-3-ultra-550b-a55b:free"
     ),
-    "🔧 Poolside Laguna S 2.1 (Software Agent)": "poolside/laguna-s-2.1:free",
 }
 
 selected_model_label = st.sidebar.selectbox(
@@ -161,60 +235,19 @@ selected_model_label = st.sidebar.selectbox(
 )
 model_id = AVAILABLE_MODELS[selected_model_label]
 
-# ПРОФИЛЬ СОЗДАТЕЛЯ И МУЛЬТИЯЗЫЧНЫЕ ИНСТРУКЦИИ
-DEVELOPER_CONTEXT = """
-SYSTEM CONTEXT & DEVELOPER PROFILE:
-You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
-Your creator Sergei Strelkov holds degrees in engineering and economics, combining analytical rigor, research passion, and inventive engineering.
-
-CRITICAL LANGUAGE & MULTILINGUAL RULE:
-- ALWAYS detect the language of the user's input prompt automatically.
-- ALWAYS respond in the EXACT SAME language that the user used in their query (e.g., English, Spanish, German, French, Chinese, Japanese, Arabic, Russian, etc.).
-- You are a native polyglot proficient in all world languages. Never force or fallback to a specific language unless the user explicitly speaks or asks for it.
-
-Key Areas of Focus:
-1. Spiking Neural Networks & Neuromorphic Computing: SNN architectures (EvaHranitelnitsa in PyTorch/snnTorch), LIF neuron models, photonic and optical processors.
-2. Battery Technology & Applied Engineering: Li-ion battery pack design (18650 cells, 10S 36V, spot welding, internal resistance), LFP, silicon anodes.
-3. Agricultural Biotechnology: Mycorrhizal fungi (Glomus inoculants), bio-stimulants, pecan cultivation.
-4. Financial Markets: Crypto analysis (Bitcoin, DeFi), options & futures hedging.
-5. Culinary Engineering: Original signature recipes (e.g. "SILICON & HONEY" salad).
-
-Deliver answers with high precision, engineering depth, and logical clarity in the user's language.
-Contact: sstt1980092@gmail.com
-"""
-
-ROLES = {
-    "🔬 Cyber-Researcher (Analytics & Science)": (
-        DEVELOPER_CONTEXT
-        + "\nMode: Academic and research analysis. Use strict logic,"
-        " calculations, and clear structure."
-    ),
-    "⚡ Neuromorphic & Code Architect": (
-        DEVELOPER_CONTEXT
-        + "\nMode: Chief Software Architect. Write clean, high-performance"
-        " code (Python, PyTorch, C++) focusing on algorithms."
-    ),
-    "🎯 Universal Core Intelligence": (
-        DEVELOPER_CONTEXT
-        + "\nMode: Universal high-level assistant. Answer concisely,"
-        " accurately, and to the point."
-    ),
-}
-
-selected_role = st.sidebar.selectbox("System Role:", list(ROLES.keys()))
-
 st.sidebar.divider()
 
-if st.sidebar.button("🔄 Clear System Context", use_container_width=True):
+if st.sidebar.button("🔄 Clear Active Chat Session", use_container_width=True):
   st.session_state.messages = []
   st.rerun()
 
-# === ЯВНЫЙ ВИДИМЫЙ БЛОК ПОДДЕРЖКИ ПРОЕКТА (КРИПТОВАЛЮТЫ) ===
+# ==============================================================================
+# 6. РАЗДЕЛ ПОДДЕРЖКИ ПРОЕКТА (КРИПТОВАЛЮТЫ)
+# ==============================================================================
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 💎 Support the Project")
-st.sidebar.caption("Поддержать развитие исследовательской станции EVA Core:")
+st.sidebar.caption("Поддержать развитие исследовательского ядра EVA Core:")
 
-# Использование st.code обеспечивает красивую подсвеченную плашку и встроенную кнопку копирования
 st.sidebar.markdown("**Bitcoin (BTC)**")
 st.sidebar.code("bc1q5hdx0z4v876p303amkqq3r9qx2wem7p4wlhq3f", language="text")
 
@@ -227,7 +260,9 @@ st.sidebar.code("ltc1qfc7pvc072rq0arc7ewz84jh0z7lwwtk7nhe84q", language="text")
 st.sidebar.markdown("**PayPal USD (PYUSD / EVM)**")
 st.sidebar.code("0x2E49F25Ef7BA15E939402589B0F6C1338FB14285", language="text")
 
-# === ПРОВЕРКА КЛЮЧА API ===
+# ==============================================================================
+# 7. ОСНОВНАЯ ЛОГИКА И ВЗАИМОДЕЙСТВИЕ
+# ==============================================================================
 api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
     "OPENROUTER_API_KEY"
 )
@@ -235,11 +270,10 @@ api_key = st.secrets.get("OPENROUTER_API_KEY") or os.environ.get(
 if not api_key:
   st.error(
       "⚠️ API Key not found. Please set `OPENROUTER_API_KEY` in Streamlit"
-      " Secrets."
+      " Secrets or Environment Variables."
   )
   st.stop()
 
-# Инициализация истории
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
@@ -249,11 +283,63 @@ for msg in st.session_state.messages:
   with st.chat_message(msg["role"], avatar=icon):
     st.write(msg["content"])
 
-# === ВВОД СООБЩЕНИЯ И ПОТОКОВАЯ ГЕНЕРАЦИЯ ===
+# Ввод запроса пользователем
 if prompt := st.chat_input("Transmit command to EVA Core..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user", avatar="👤"):
     st.write(prompt)
+
+  # Проверка команды на запоминание
+  if any(
+      kw in prompt.lower() for kw in ["запомни", "сохрани факт", "зафиксируй"]
+  ):
+    save_memory_fact(prompt)
+    st.toast("Факт сохранен в долговременную память!", icon="💾")
+
+  # --- Сборка контекста памяти ---
+  memory_context_str = ""
+  if enable_persistent_memory:
+    facts = load_memory()
+    if facts:
+      memory_context_str = (
+          "\n[PERSISTENT MEMORY STORE - KNOWN FACTS]:\n"
+          + "\n".join([f"- {f}" for f in facts])
+          + "\n"
+      )
+
+  # --- Выход в сеть (Web Search) ---
+  web_context_str = ""
+  search_keywords = [
+      "новости",
+      "курс",
+      "свежие",
+      "найди",
+      "погода",
+      "сегодня",
+      "2026",
+      "цена",
+      "актуальный",
+  ]
+  if enable_web_search and any(kw in prompt.lower() for kw in search_keywords):
+    with st.status("🔍 Выход в сеть и поиск данных...", expanded=False):
+      search_res = search_duckduckgo(prompt)
+      web_context_str = (
+          f"\n[REAL-TIME WEB DATA SEARCH RESULTS]:\n{search_res}\n"
+      )
+
+  # Системные инструкции
+  system_instruction = f"""
+SYSTEM CONTEXT & DEVELOPER PROFILE:
+You are EVA Core AI, an advanced cybernetic research intelligence created by Sergei Strelkov (born September 10, 1980, e-mail: sstt1980092@gmail.com).
+
+CRITICAL INSTRUCTIONS:
+1. ALWAYS detect the user's language and respond in the EXACT SAME language.
+2. Use the persistent memory and real-time web results provided below to enrich and perfect your analysis.
+3. Answer with maximum engineering depth, analytical rigor, and accuracy.
+
+{memory_context_str}
+{web_context_str}
+"""
 
   headers = {
       "Authorization": f"Bearer {api_key}",
@@ -262,7 +348,7 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
       "X-Title": "EVA Core Workstation by Sergei Strelkov",
   }
 
-  full_messages = [{"role": "system", "content": ROLES[selected_role]}] + [
+  full_messages = [{"role": "system", "content": system_instruction}] + [
       {"role": m["role"], "content": m["content"]}
       for m in st.session_state.messages
   ]
@@ -270,7 +356,7 @@ if prompt := st.chat_input("Transmit command to EVA Core..."):
   payload = {
       "model": model_id,
       "messages": full_messages,
-      "temperature": 0.6,
+      "temperature": 0.5,
       "max_tokens": 2048,
       "stream": True,
   }
