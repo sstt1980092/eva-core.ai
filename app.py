@@ -400,6 +400,7 @@ if not api_keys:
 
 
 def send_openrouter_request(headers, payload, keys):
+    last_response = None
     for idx, key in enumerate(keys):
         headers["Authorization"] = f"Bearer {key}"
         try:
@@ -410,13 +411,14 @@ def send_openrouter_request(headers, payload, keys):
                 stream=True,
                 timeout=60,
             )
+            last_response = response
             if response.status_code == 429:
                 st.warning(f"⚠️ Лимит ключа #{idx+1} исчерпан (429). Переключаем на следующий ключ...")
                 continue
             return response
         except Exception:
             continue
-    return None
+    return last_response
 
 
 if "messages" not in st.session_state:
@@ -455,9 +457,13 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
     if enable_web_search and any(kw in prompt.lower() for kw in search_trigger_keywords):
         clean_search_query = clean_query_for_search(prompt)
         with st.status(f"🌐 Ищу информацию: '{clean_search_query}'...", expanded=False) as status:
-            search_res = search_duckduckgo(clean_search_query)
-            web_context_str = f"\n[REAL-TIME DUCKDUCKGO SEARCH RESULTS]:\n{search_res}\n"
-            status.update(label="✅ Данные получены!", state="complete", expanded=False)
+            try:
+                search_res = search_duckduckgo(clean_search_query)
+                web_context_str = f"\n[REAL-TIME DUCKDUCKGO SEARCH RESULTS]:\n{search_res}\n"
+                status.update(label="✅ Данные получены!", state="complete", expanded=False)
+            except Exception as se:
+                web_context_str = f"\n[SEARCH ERROR]: {se}\n"
+                status.update(label="⚠️ Ошибка поиска", state="error", expanded=False)
 
     current_date_str = datetime.now().strftime("%Y-%m-%d")
 
@@ -508,15 +514,4 @@ if prompt := st.chat_input("Задай вопрос Еве..."):
         "messages": full_messages,
         "temperature": 0.3,
         "max_tokens": 2048,
-        "stream": True,
-    }
-
-    with st.chat_message("assistant", avatar="🌸"):
-        message_placeholder = st.empty()
-        full_response = ""
-
-        try:
-            response = send_openrouter_request(headers, payload, api_keys)
-
-            if response and response.status_code == 200:
- 
+        "strea
