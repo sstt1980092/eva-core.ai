@@ -23,11 +23,8 @@ st.sidebar.title("🎛️ Центр Управления")
 st.sidebar.markdown("**Создатель:** Sergei Strelkov")
 st.sidebar.divider()
 
-# В списке только 100% рабочие бесплатные эндпоинты и про-модели
+# Гарантированно бесплатные модельки (с суффиксом :free)
 AVAILABLE_MODELS = {
-    "🌐 Auto Free Router (Гарантированно бесплатный автовыбор)": (
-        "openrouter/auto"
-    ),
     "⚡ Llama 3.2 3B (Free / Ultra Fast)": (
         "meta-llama/llama-3.2-3b-instruct:free"
     ),
@@ -37,11 +34,12 @@ AVAILABLE_MODELS = {
     "💻 Qwen 2.5 Coder 32B (Free / Code)": (
         "qwen/qwen-2.5-coder-32b-instruct:free"
     ),
-    "🔥 DeepSeek R1 (Paid / Official)": "deepseek/deepseek-r1",
-    "👑 Llama 3.3 70B (Paid / Flagship)": (
+    "🌐 OpenRouter Free Router (Только бесплатные)": "openrouter/free",
+    "🔥 DeepSeek R1 (Требуется баланс)": "deepseek/deepseek-r1",
+    "👑 Llama 3.3 70B (Требуется баланс)": (
         "meta-llama/llama-3.3-70b-instruct"
     ),
-    "🧠 OpenAI GPT-4o (Paid / Pro)": "openai/gpt-4o",
+    "🧠 OpenAI GPT-4o (Требуется баланс)": "openai/gpt-4o",
 }
 
 selected_model_label = st.sidebar.selectbox(
